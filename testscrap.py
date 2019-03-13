@@ -42,10 +42,10 @@ class CPU:
 	def normalize(self,name, price):
 		data = [] 
 		name.replace(',','').replace('Processor','').replace('Desktop',''); #removing unrequired tags
-		data.append(re.findall(("[0-9]{4}K?"),name)[0]) #getting the CPU by using regex to find 4 consecutive occurences of numbers eg 8000k
+		data.append(re.search(("[0-9]{4}K?"),name).group()) #getting the CPU by using regex to find 4 consecutive occurences of numbers eg 8000k
 		data.append(name) #complete title of the product for descriptive purposes
-		data.append(re.findall(("(Intel|AMD)"),name)[0]) #regex to find product brand, amd or intel
-		data.append(re.findall(("(Core|Ryzen) (i[0-9]|[0-9])"),name)[0]) #regex to find series e.g Ryzen 5 or Core i7
+		data.append(re.search(("(Intel|AMD)"),name).group()) #regex to find product brand, amd or intel
+		data.append(re.search(("(Core|Ryzen) (i[0-9]|[0-9])"),name).group()) #regex to find series e.g Ryzen 5 or Core i7
 		if(data[2][0]=='I'): #finding the generation of a cpu from it's ID, intel's first letter of code defines the generation, eg 8000k means 8th gen
 			data.append(data[0][0]) 
 		else:
