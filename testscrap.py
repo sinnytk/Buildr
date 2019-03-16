@@ -4,10 +4,8 @@ import csv
 from bs4 import BeautifulSoup
 
 #creating a class for easy usage of objects
-
-def CPUscrap(link):
-	#scraping from czone for now
-	CPUs = []
+def CZONE(type,link):
+	products = []
 	req = requests.get(link)
 	soup = BeautifulSoup(req.content,'html.parser')
 	if(soup.find(id="anLastPageBottom").has_attr('href')):
@@ -23,7 +21,31 @@ def CPUscrap(link):
 			pn = soup.find(id=pn).text.strip()
 			pp='rptListView_ctl0'+str(product)+'_spnPrice'
 			pp = soup.find(id=pp).text.strip()
-			CPUs.append(CPU(pn,pp))
+			products.append(CPU(pn,pp))
+	return products
+def PAKDUKAAN(type,link):
+	products = []
+	req = requests.get(link)
+	soup = BeautifulSoup(req.content, 'html.parser')
+	pages = len(soup.find_all('ol')[0].find_all('li'))-1
+	for page in range(pages):
+		pagelink = link+'?'+str(page+1)
+		req = requests.get(pagelink)
+		
+		soup = BeautifulSoup(req.content, "html.parser")
+		for product in soup.find_all("li",class_="info-details"):
+
+			pn=product.find("h2",class_="product-name").text
+			pp=product.find("span",class_="price").text
+			print(pn + "< -- ")
+			products.append(CPU(pn,pp))
+	return products
+
+def CPUscrap():
+	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors']
+	CPUs = []
+	CPUs.extend(CZONE('CPU',links[0]))
+	CPUs.extend(PAKDUKAAN('CPU',links[1]))
 	return CPUs
 
 
@@ -94,7 +116,8 @@ def main():
 	# cpuname,cpuprices = scrap("http://czone.com.pk/processors-pakistan-ppt.85.aspx")
 	# moboname,moboprices = scrap("http://czone.com.pk/motherboards-pakistan-ppt.157.aspx")
 	# gpuname,gpuprices = scrap("http://czone.com.pk/graphic-cards-pakistan-ppt.154.aspx")
-	CPUs = CPUscrap('http://czone.com.pk/processors-pakistan-ppt.85.aspx')
+	CPUs = CPUscrap()
+	print(len(CPUs))
 	for CPU in CPUs:
 		print(CPU.printDetails())
 		print("\n\n")
