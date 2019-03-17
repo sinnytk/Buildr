@@ -33,11 +33,9 @@ def PAKDUKAAN(type,link):
 		req = requests.get(pagelink)
 		
 		soup = BeautifulSoup(req.content, "html.parser")
-		for product in soup.find_all("li",class_="info-details"):
-
-			pn=product.find("h2",class_="product-name").text
-			pp=product.find("span",class_="price").text
-			print(pn + "< -- ")
+		for product in soup.find_all("div",class_="product-item-info"):
+			pn=product.find("h2",class_="product-name").a['title'].strip().replace(u"\u2122", '').replace(u"\u00AE",'')
+			pp=product.find("span",class_="price").text.strip()
 			products.append(CPU(pn,pp))
 	return products
 
@@ -62,22 +60,22 @@ class CPU:
 
 	#function to normalize/parse the content of a CPU product title
 	def normalize(self,name, price):
-		data = [] 
+		data = []
 		name.replace(',','').replace('Processor','').replace('Desktop',''); #removing unrequired tags
-		data.append(re.search(("[0-9]{4}K?"),name).group()) #getting the CPU by using regex to find 4 consecutive occurences of numbers eg 8000k
+		data.append(re.search(("[0-9]{4}(K|T|P|U)?"),name).group(0)) #getting the CPU by using regex to find 4 consecutive occurences of numbers eg 8000k
 		data.append(name) #complete title of the product for descriptive purposes
-		data.append(re.search(("(Intel|AMD)"),name).group()) #regex to find product brand, amd or intel
-		data.append(re.search(("(Core|Ryzen) (i[0-9]|[0-9])"),name).group()) #regex to find series e.g Ryzen 5 or Core i7
+		data.append(re.search(("(Intel|AMD)"),name).group(0)) #regex to find product brand, amd or intel
+		data.append(re.search(("(Core|Ryzen)( |-)(i[0-9]|[0-9])"),name).group(0)) #regex to find series e.g Ryzen 5 or Core i7
 		if(data[2][0]=='I'): #finding the generation of a cpu from it's ID, intel's first letter of code defines the generation, eg 8000k means 8th gen
-			data.append(data[0][0]) 
+			data.append(data[0][0])
 		else:
 			data.append(data[3][1:][0]) #for AMD it's the letter right after Ryzen, e.g Ryzen 5 means 5th gen
 		data[0]=data[2][0]+data[0] #appending company initial in the ID, 'A' or 'I' to descriminate intel and amd
 		if(data[2][0]=='A' or data[0][-1:]=='K'): #defining the state of overclockability
 			data.append('Yes')
 		else:
-			data.append('No') 
-		data.append(int(price.replace(',','')[3:])) #removing Rs. from 'Rs. 20000'
+			data.append('No')
+		data.append(int(price.replace(',','')[4:])) #removing Rs. from 'Rs. 20000'
 		return data
 
 	def printDetails(self):
