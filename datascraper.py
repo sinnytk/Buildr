@@ -31,7 +31,6 @@ def PAKDUKAAN(type,link):
 	for page in range(pages):
 		pagelink = link+'?'+str(page+1)
 		req = requests.get(pagelink)
-		
 		soup = BeautifulSoup(req.content, "html.parser")
 		for product in soup.find_all("div",class_="product-item-info"):
 			pn=product.find("h2",class_="product-name").a['title'].strip().replace(u"\u2122", '').replace(u"\u00AE",'')
@@ -59,15 +58,15 @@ def GALAXY(type, link):
 
 def CPUscrap():
 	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons/processor/intel.html','https://www.galaxy.pk/pc-addons/processor/amd.html']
-	CPUs = []
-	CPUs.extend(CZONE('CPU',links[0]))
-	CPUs.extend(PAKDUKAAN('CPU',links[1]))
-	CPUs.extend(GALAXY('CPU',links[2]))
+	CPUs = set()
+	CPUs.update(CZONE('CPU',links[0]))
+	CPUs.update(PAKDUKAAN('CPU',links[1]))
+	CPUs.update(GALAXY('CPU',links[2]))
 	return CPUs
 
-class MOBO:
-	def __init__(self,name, price):
-		data = self.normalize(name, price)
+#class MOBO:
+#	def __init__(self,name, price):
+#		data = self.normalize(name, price)
 		
 class CPU:
 	def __init__(self,name, price):
@@ -79,6 +78,12 @@ class CPU:
 		self.CPUgen = data[4]
 		self.CPUunlocked = data[5]
 		self.CPUprice = data[6]
+	def __eq__(self, other):
+		return self.CPUid == other.CPUid
+		#and (self.CPUtitle == other.CPUtitle) and (self.CPUbrand == other.CPUbrand) and (self.CPUseries == other.CPUseries) and (self.CPUgen == other.CPUgen) and (self.CPUunlocked == other.CPUunlocked)
+
+	def __hash__(self):
+		return hash((self.CPUid))
 
 	#function to normalize/parse the content of a CPU product title
 	def normalize(self,name, price):
@@ -104,17 +109,10 @@ class CPU:
 		print("CPU ID: %s\nCPUtitle: %s\nCPUbrand: %s\nCPUseries: %s\nCPUgen: %s\nUnlocked: %s\nPrice: %d" %(self.CPUid, self.CPUtitle, self.CPUbrand, self.CPUseries, self.CPUgen, self.CPUunlocked, self.CPUprice))
 	
 def main():
-	# cpuname,cpuprices = scrap("http://czone.com.pk/processors-pakistan-ppt.85.aspx")
-	# moboname,moboprices = scrap("http://czone.com.pk/motherboards-pakistan-ppt.157.aspx")
-	# gpuname,gpuprices = scrap("http://czone.com.pk/graphic-cards-pakistan-ppt.154.aspx")
 	CPUs = CPUscrap()
 	print(len(CPUs))
 	for CPU in CPUs:
-		CPU.printDetails()
-		print("\n\n")
-	# writecsv("CPU",cpuname,cpuprices)
-	# writecsv("MOBO",moboname,moboprices)
-	# writecsv("GPU",gpuname,gpuprices)
+		print(CPU.CPUid)
 
 if __name__ == "__main__":
 	main()
