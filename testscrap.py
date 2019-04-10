@@ -58,7 +58,7 @@ def GALAXY(type, link):
 		
 
 def CPUscrap():
-	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons/processor/intel.html']
+	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons/processor/intel.html','https://www.galaxy.pk/pc-addons/processor/amd.html']
 	CPUs = []
 	CPUs.extend(CZONE('CPU',links[0]))
 	CPUs.extend(PAKDUKAAN('CPU',links[1]))
@@ -83,7 +83,7 @@ class CPU:
 	#function to normalize/parse the content of a CPU product title
 	def normalize(self,name, price):
 		data = []
-		name.replace(',','').replace('Processor','').replace('Desktop',''); #removing unrequired tags
+		name.replace(',','').replace('Processor','').replace('Desktop','') #removing unrequired tags
 		data.append(re.search(("[0-9]{4}(K|k|T|t|P|p|U|u|X|x)?"),name).group(0).upper()) #getting the CPU by using regex to find 4 consecutive occurences of numbers eg 8000k
 		data.append(name) #complete title of the product for descriptive purposes
 		data.append(re.search(("(Intel|AMD)"),name).group(0)) #regex to find product brand, amd or intel
@@ -97,7 +97,7 @@ class CPU:
 			data.append('Yes')
 		else:
 			data.append('No')
-		data.append(int(price.replace(',','')[4:])) #removing Rs. from 'Rs. 20000'
+		data.append(int(price.replace(',','')[3:])) #removing Rs. from 'Rs. 20000'
 		return data
 
 	def printDetails(self):
