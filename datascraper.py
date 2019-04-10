@@ -59,10 +59,14 @@ def GALAXY(type, link):
 def CPUscrap():
 	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons/processor/intel.html','https://www.galaxy.pk/pc-addons/processor/amd.html']
 	CPUs = set()
-	CPUs.update(CZONE('CPU',links[0]))
-	CPUs.update(PAKDUKAAN('CPU',links[1]))
-	CPUs.update(GALAXY('CPU',links[2]))
-	return CPUs
+	czone_prices=CZONE('CPU',links[0])
+	pakdukaan_prices=PAKDUKAAN('CPU',links[1])
+	galaxy_prices=GALAXY('CPU',links[2])
+
+	CPUs.update(czone_prices)
+	CPUs.update(pakdukaan_prices)
+	CPUs.update(galaxy_prices)
+	return CPUs, czone_prices, pakdukaan_prices, galaxy_prices
 
 #class MOBO:
 #	def __init__(self,name, price):
@@ -109,10 +113,23 @@ class CPU:
 		print("CPU ID: %s\nCPUtitle: %s\nCPUbrand: %s\nCPUseries: %s\nCPUgen: %s\nUnlocked: %s\nPrice: %d" %(self.CPUid, self.CPUtitle, self.CPUbrand, self.CPUseries, self.CPUgen, self.CPUunlocked, self.CPUprice))
 	
 def main():
-	CPUs = CPUscrap()
-	print(len(CPUs))
-	for CPU in CPUs:
-		print(CPU.CPUid)
+	available, czone, pakdukaan, galaxy = CPUscrap()
+	with open('available_cpus.csv', mode='w') as csv_file:
+		writer = csv.writer(csv_file, delimiter=',')
+		for CPU in available:
+			writer.writerow([CPU.CPUid,CPU.CPUbrand,CPU.CPUtitle,CPU.CPUseries,CPU.CPUgen,CPU.CPUunlocked])
+	with open('czone_cpus.csv', mode='w') as csv_file:
+		writer = csv.writer(csv_file, delimiter=',')
+		for CPU in czone:
+			writer.writerow([CPU.CPUid,CPU.CPUbrand,CPU.CPUtitle,CPU.CPUseries,CPU.CPUgen,CPU.CPUunlocked,CPU.CPUprice])
+	with open('pakdukaan_cpus.csv', mode='w') as csv_file:
+		writer = csv.writer(csv_file, delimiter=',')
+		for CPU in pakdukaan:
+			writer.writerow([CPU.CPUid,CPU.CPUbrand,CPU.CPUtitle,CPU.CPUseries,CPU.CPUgen,CPU.CPUunlocked,CPU.CPUprice])
+	with open('galaxy_cpus.csv', mode='w') as csv_file:
+		writer = csv.writer(csv_file, delimiter=',')
+		for CPU in galaxy:
+			writer.writerow([CPU.CPUid,CPU.CPUbrand,CPU.CPUtitle,CPU.CPUseries,CPU.CPUgen,CPU.CPUunlocked,CPU.CPUprice])
 
 if __name__ == "__main__":
 	main()
