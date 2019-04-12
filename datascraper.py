@@ -12,7 +12,7 @@ def CZONE(type,link):
 		pages = int(soup.find(id="anLastPageBottom")['href'][-1])
 	else:
 		pages = 1
-	for page in range(pages):
+	for page in range(1,pages):
 		pagelink = link+"?page="+str(page+1)
 		req = requests.get(pagelink)
 		soup = BeautifulSoup(req.content, "html.parser")
@@ -29,7 +29,7 @@ def PAKDUKAAN(type,link):
 	soup = BeautifulSoup(req.content, 'html.parser')
 	pages = len(soup.find_all('ol')[0].find_all('li'))-1
 	for page in range(pages):
-		pagelink = link+'?'+str(page+1)
+		pagelink = link+'?p='+str(page+1)
 		req = requests.get(pagelink)
 		soup = BeautifulSoup(req.content, "html.parser")
 		for product in soup.find_all("div",class_="product-item-info"):
@@ -57,15 +57,18 @@ def GALAXY(type, link):
 		
 
 def CPUscrap():
-	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons/processor/intel.html','https://www.galaxy.pk/pc-addons/processor/amd.html']
+	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons/processor/intel.html']
 	CPUs = set()
 	czone_prices=CZONE('CPU',links[0])
 	pakdukaan_prices=PAKDUKAAN('CPU',links[1])
 	galaxy_prices=GALAXY('CPU',links[2])
 
-	CPUs.update(czone_prices)
-	CPUs.update(pakdukaan_prices)
-	CPUs.update(galaxy_prices)
+	for product in czone_prices:
+		CPUs.add(product)
+	for product in pakdukaan_prices:
+		CPUs.add(product)
+	for product in galaxy_prices:
+		CPUs.add(product)
 	return CPUs, czone_prices, pakdukaan_prices, galaxy_prices
 
 #class MOBO:
@@ -84,10 +87,8 @@ class CPU:
 		self.CPUprice = data[6]
 	def __eq__(self, other):
 		return self.CPUid == other.CPUid
-		#and (self.CPUtitle == other.CPUtitle) and (self.CPUbrand == other.CPUbrand) and (self.CPUseries == other.CPUseries) and (self.CPUgen == other.CPUgen) and (self.CPUunlocked == other.CPUunlocked)
-
 	def __hash__(self):
-		return hash((self.CPUid))
+		return hash (self.CPUid)
 
 	#function to normalize/parse the content of a CPU product title
 	def normalize(self,name, price):
@@ -97,10 +98,7 @@ class CPU:
 		data.append(name) #complete title of the product for descriptive purposes
 		data.append(re.search(("(Intel|AMD)"),name).group(0)) #regex to find product brand, amd or intel
 		data.append(re.search(("(Core|Ryzen)( |-)((i|I)[0-9]|[0-9])"),name).group(0)) #regex to find series e.g Ryzen 5 or Core i7
-		if(data[2][0]=='I'): #finding the generation of a cpu from it's ID, intel's first letter of code defines the generation, eg 8000k means 8th gen
-			data.append(data[0][0])
-		else:
-			data.append(data[3][1:][0]) #for AMD it's the letter right after Ryzen, e.g Ryzen 5 means 5th gen
+		data.append(data[0][0])
 		data[0]=data[2][0]+data[0] #appending company initial in the ID, 'A' or 'I' to descriminate intel and amd
 		if(data[2][0]=='A' or data[0][-1:]=='K'): #defining the state of overclockability
 			data.append('Yes')
@@ -114,6 +112,9 @@ class CPU:
 	
 def main():
 	available, czone, pakdukaan, galaxy = CPUscrap()
+	for avail in available:
+		print(avail.CPUid)
+	
 	with open('available_cpus.csv', mode='w') as csv_file:
 		writer = csv.writer(csv_file, delimiter=',')
 		for CPU in available:
@@ -121,15 +122,15 @@ def main():
 	with open('czone_cpus.csv', mode='w') as csv_file:
 		writer = csv.writer(csv_file, delimiter=',')
 		for CPU in czone:
-			writer.writerow([CPU.CPUid,CPU.CPUbrand,CPU.CPUtitle,CPU.CPUseries,CPU.CPUgen,CPU.CPUunlocked,CPU.CPUprice])
+			writer.writerow([CPU.CPUid,CPU.CPUprice])
 	with open('pakdukaan_cpus.csv', mode='w') as csv_file:
 		writer = csv.writer(csv_file, delimiter=',')
 		for CPU in pakdukaan:
-			writer.writerow([CPU.CPUid,CPU.CPUbrand,CPU.CPUtitle,CPU.CPUseries,CPU.CPUgen,CPU.CPUunlocked,CPU.CPUprice])
+			writer.writerow([CPU.CPUid,CPU.CPUprice])
 	with open('galaxy_cpus.csv', mode='w') as csv_file:
 		writer = csv.writer(csv_file, delimiter=',')
 		for CPU in galaxy:
-			writer.writerow([CPU.CPUid,CPU.CPUbrand,CPU.CPUtitle,CPU.CPUseries,CPU.CPUgen,CPU.CPUunlocked,CPU.CPUprice])
+			writer.writerow([CPU.CPUid,CPU.CPUprice])
 
 if __name__ == "__main__":
 	main()
