@@ -59,14 +59,39 @@ def GALAXY(type, link):
 			pp=pp[:-3]
 			products.append(CPU(pn,pp))
 	return products
-		
+def SHINGPOINT(type, link):
+	products = []
+	req = requests.get(link)
+	soup = BeautifulSoup(req.content,'html.parser')
+	if(soup.find(id="anLastPageBottom").has_attr('href')):
+		pages = int(soup.find(id="anLastPageBottom")['href'][-1])
+	else:
+		pages = 1
+	for page in range(1,pages):
+		pagelink = link+"?page="+str(page+1)
+		req = requests.get(pagelink)
+		soup = BeautifulSoup(req.content, "html.parser")
+		for product in range(len(soup.find_all("div",class_="product"))):
+			pn='rptListView_ctl0'+str(product)+'_anProductName'
+			tempsoup = BeautifulSoup(requests.get("https://www.shingpoint.com.pk"+((soup.find(id=pn))['href'])).content,'html.parser')
+			pn = soup.find(id=pn).text.strip()
+			pp='rptListView_ctl0'+str(product)+'_spnPrice'
+			pp = soup.find(id=pp).text.strip()
+			code = tempsoup.find(id='spnProductCode').text.strip()
+			products.append(MOBO(pn,pp,code))
+			
+
+	return products
 def MOBOscrap():
-	links=['http://czone.com.pk/motherboards-pakistan-ppt.157.aspx']
+	links=['http://czone.com.pk/motherboards-pakistan-ppt.157.aspx','https://www.shingpoint.com.pk/motherboards-pakistan-ppt.10302.aspx']
 	CPUS = set()
 	czone_prices=CZONE('MOBO',links[0])
+	shingpoint_price=SHINGPOINT('MOBO',links[1])
 	for product in czone_prices:
 		CPUS.add(product)
-	return CPUS, czone_prices
+	for product in shingpoint_price:
+		CPUS.add(product)
+	return CPUS, czone_prices, shingpoint_price
 
 def CPUscrap():
 	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons/processor/intel.html']
@@ -113,7 +138,7 @@ class MOBO:
 			return 'AMD','AM4'
 	def normalize(self,name,price,code):
 		data = {}
-		data['id']=code.replace(' ','-').upper()
+		data['id']=code.replace(' ','').replace('-','').replace('(','').replace(')','').upper()
 		data['title']=name
 		data['vendor']=name.split(' ',1)[0]#retrieving the vendor name, which is always at front
 		data['chipset']=(re.search(('[AHBQZX]([0-9])+'),name).group(0)) 
@@ -206,7 +231,7 @@ class CPU:
 	
 def main():
 	#available_cpus, czone_cpus, pakdukaan_cpus, galaxy_cpus = CPUscrap()
-	available_mobos, czone_mobos = MOBOscrap()
+	available_mobos, czone_mobos,shingpoint_mobos = MOBOscrap()
 	print('id\tbrand\tvendor\tchipset\tsocket')
 	for avail in available_mobos:
 		print('%-30s %-10s %-10s %-10s %-10s'% (avail.id, avail.brand, avail.vendor, avail.chipset, avail.socket))
