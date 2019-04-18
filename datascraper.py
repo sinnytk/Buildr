@@ -13,7 +13,7 @@ def CZONE(type,link):
 	else:
 		pages = 1
 	for page in range(1,pages):
-		pagelink = link+"?page="+str(page+1)
+		pagelink = link+"?page="+str(page)
 		req = requests.get(pagelink)
 		soup = BeautifulSoup(req.content, "html.parser")
 		for product in range(len(soup.find_all("div",class_="product"))):
@@ -68,16 +68,19 @@ def SHINGPOINT(type, link):
 	else:
 		pages = 1
 	for page in range(1,pages):
-		pagelink = link+"?page="+str(page+1)
+		pagelink = link+"?page="+str(page)
 		req = requests.get(pagelink)
 		soup = BeautifulSoup(req.content, "html.parser")
 		for product in range(len(soup.find_all("div",class_="product"))):
 			pn='rptListView_ctl0'+str(product)+'_anProductName'
+			
 			tempsoup = BeautifulSoup(requests.get("https://www.shingpoint.com.pk"+((soup.find(id=pn))['href'])).content,'html.parser')
 			pn = soup.find(id=pn).text.strip()
 			pp='rptListView_ctl0'+str(product)+'_spnPrice'
 			pp = soup.find(id=pp).text.strip()
+			
 			code = tempsoup.find(id='spnProductCode').text.strip()
+			print(str(product)+'\t'+pn[:10]+'\t'+pp+'\t'+code)
 			products.append(MOBO(pn,pp,code))
 			
 
@@ -116,7 +119,11 @@ class MOBO:
 		self.chipset=data['chipset']
 		self.vendor=data['vendor']
 		self.brand,self.socket=self.getSocket()
-	
+		self.price=data['price']
+		def __eq__(self, other):
+			return self.CPUid == other.CPUid
+		def __hash__(self):
+			return hash (self.CPUid)	
 	def getSocket(self):
 		if(self.chipset not in ['X470','X370','B450','B350','A320','X300','A300','B300']):
 			if(re.search('[HBQPZ]5[57]$',self.chipset)):
@@ -138,13 +145,14 @@ class MOBO:
 			return 'AMD','AM4'
 	def normalize(self,name,price,code):
 		data = {}
-		data['id']=code.replace(' ','').replace('-','').replace('(','').replace(')','').upper()
+		data['id']=code.replace(' ','-').replace('(','-').replace(')','-').upper()
 		data['title']=name
 		data['vendor']=name.split(' ',1)[0]#retrieving the vendor name, which is always at front
-		data['chipset']=(re.search(('[AHBQZX]([0-9])+'),name).group(0)) 
+		data['chipset']=(re.search(('[AHBQZX]([0-9])+'),name).group(0)) if (re.search(('[AHBQZX]([0-9])+'),name)) else 'not available'
 		data['price']=int(price.replace(',','')[3:]) #removing Rs. from 'Rs. 20000'
 		return data
 		
+
 class CPU:
 	def __init__(self,name, price):
 		data = self.normalize(name, price)
@@ -233,8 +241,19 @@ def main():
 	#available_cpus, czone_cpus, pakdukaan_cpus, galaxy_cpus = CPUscrap()
 	available_mobos, czone_mobos,shingpoint_mobos = MOBOscrap()
 	print('id\tbrand\tvendor\tchipset\tsocket')
-	for avail in available_mobos:
-		print('%-30s %-10s %-10s %-10s %-10s'% (avail.id, avail.brand, avail.vendor, avail.chipset, avail.socket))
+	for mobos in czone_mobos:
+		print('%-30s %-10s %-10s %-10s %-10s'% (mobos.id, mobos.brand, mobos.vendor, mobos.chipset, mobos.socket))
+	print("\n\nSHINGPOINT")
+	for mobos in shingpoint_mobos:
+		print('%-30s %-10s %-10s %-10s %-10s'% (mobos.id, mobos.brand, mobos.vendor, mobos.chipset, mobos.socket))
+	with open('shingpoint_mobos.csv',mode='w') as csv_file:
+		writer = csv.writer(csv_file,delimiter=',')
+		for mobo in shingpoint_mobos:
+			writer.writerow([mobo.id, mobo.brand, mobo.vendor, mobo.chipset, mobo.socket,mobo.price])
+	with open('czone_mobos.csv',mode='w') as csv_file:
+		writer = csv.writer(csv_file,delimiter=',')
+		for mobo in czone_mobos:
+			writer.writerow([mobo.id, mobo.brand, mobo.vendor, mobo.chipset, mobo.socket,mobo.price])
 
 	#for avail in available_cpus:
 	#	print(avail.CPUid)
