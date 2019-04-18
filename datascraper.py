@@ -10,10 +10,12 @@ def CZONE(type,link):
 	soup = BeautifulSoup(req.content,'html.parser')
 	if(soup.find(id="anLastPageBottom").has_attr('href')):
 		pages = int(soup.find(id="anLastPageBottom")['href'][-1])
+		print(pages)
 	else:
 		pages = 1
-	for page in range(1,pages):
+	for page in range(1,pages+1):
 		pagelink = link+"?page="+str(page)
+		print(pagelink)
 		req = requests.get(pagelink)
 		soup = BeautifulSoup(req.content, "html.parser")
 		for product in range(len(soup.find_all("div",class_="product"))):
@@ -67,7 +69,7 @@ def SHINGPOINT(type, link):
 		pages = int(soup.find(id="anLastPageBottom")['href'][-1])
 	else:
 		pages = 1
-	for page in range(1,pages):
+	for page in range(1,pages+1):
 		pagelink = link+"?page="+str(page)
 		req = requests.get(pagelink)
 		soup = BeautifulSoup(req.content, "html.parser")
