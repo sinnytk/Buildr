@@ -25,11 +25,14 @@ def CZONE(type,link):
 			pn = soup.find(id=pn).text.strip()
 			pp='rptListView_ctl0'+str(product)+'_spnPrice'
 			pp = soup.find(id=pp).text.strip()
+			code=soup.find(id='rptListView_ctl0'+str(product)+'_spnProductCode').text.strip()
 			if(type=='CPU'):
 				products.append(CPU(pn,pp,pl))
 			elif(type=='MOBO'):
-				code=soup.find(id='rptListView_ctl0'+str(product)+'_spnProductCode').text.strip()
 				products.append(MOBO(pn,pp,code,pl))
+			elif(type=="GPU"):
+				products.append(GPU(pn,pp,code,pl))
+
 
 	return products
 def PAKDUKAAN(type,link):
@@ -47,7 +50,12 @@ def PAKDUKAAN(type,link):
 			pl=p.a['href']
 			pn=p.a['title'].strip().replace(u"\u2122", '').replace(u"\u00AE",'')
 			pp=product.find("span",class_="price").text.strip()
-			products.append(CPU(pn,pp,pl))
+			if(type=="CPU"):
+				products.append(CPU(pn,pp,pl))
+			elif(type=="GPU"):
+				tempsoup = BeautifulSoup((requests.get(pl)).content,'html.parser')
+				code=tempsoup.find("h3",class_="product-shop-sku").strong.text.strip()
+				products.append(GPU(pn,pp,code,pl))
 	return products
 def GALAXY(type, link):
 	products = []
@@ -90,33 +98,63 @@ def SHINGPOINT(type, link):
 			pp='rptListView_ctl0'+str(product)+'_spnPrice'
 			pp = soup.find(id=pp).text.strip()
 			code = tempsoup.find(id='spnProductCode').text.strip()
-			products.append(MOBO(pn,pp,code,pl))
+			if(type=="MOBO"):
+				products.append(MOBO(pn,pp,code,pl))
+			elif(type=="GPU"):
+				products.append(GPU(pn,pp,code,pl))
 	return products
 def MOBOscrap():
 	links=['http://czone.com.pk/motherboards-pakistan-ppt.157.aspx','https://www.shingpoint.com.pk/motherboards-pakistan-ppt.10302.aspx']
-	MOBOs = set()
+	distinct = set()
+	_all = []
 	czone_prices=CZONE('MOBO',links[0])
-	shingpoint_price=SHINGPOINT('MOBO',links[1])
+	shingpoint_prices=SHINGPOINT('MOBO',links[1])
 	for product in czone_prices:
-		MOBOs.add(product)
-	for product in shingpoint_price:
-		MOBOs.add(product)
-	return MOBOs, czone_prices, shingpoint_price
+		_all.append(product)
+		distinct.add(product)
+	for product in shingpoint_prices:
+		_all.append(product)
+		distinct.add(product)
+	return distinct, _all
 
 def CPUscrap():
 	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons.html?cat=1276']
-	CPUs = set()
+	distinct = set()
+	_all = []
 	czone_prices=CZONE('CPU',links[0])
 	pakdukaan_prices=PAKDUKAAN('CPU',links[1])
 	galaxy_prices=GALAXY('CPU',links[2])
 
 	for product in czone_prices:
-		CPUs.add(product)
+
+		_all.append(product)
+		distinct.add(product)
 	for product in pakdukaan_prices:
-		CPUs.add(product)
+		_all.append(product)
+		distinct.add(product)
 	for product in galaxy_prices:
-		CPUs.add(product)
-	return CPUs, czone_prices, pakdukaan_prices, galaxy_prices
+		_all.append(product)
+		distinct.add(product)
+	return distinct, _all
+def GPUscrap():
+	links = ['http://czone.com.pk/graphic-cards-pakistan-ppt.154.aspx','https://www.pakdukaan.com/pc-hardware-accessories/graphics-cards','https://www.shingpoint.com.pk/graphic-cards-pakistan-ppt.10293.aspx']
+	distinct = set()
+	_all = []
+	czone_prices=CZONE('GPU',links[0])
+	pakdukaan_prices=PAKDUKAAN('GPU',links[1])
+	shingpoint_prices=SHINGPOINT('GPU',links[2])
+
+	for product in czone_prices:
+		if(product.id!=''):
+			_all.append(product)
+			distinct.add(product)
+	for product in pakdukaan_prices:
+		_all.append(product)
+		distinct.add(product)
+	for product in shingpoint_prices:
+		_all.append(product)
+		distinct.add(product)
+	return distinct, _all
 
 class MOBO:
 	def __init__(self,name, price,code,link):
@@ -153,13 +191,44 @@ class MOBO:
 			return 'AMD','AM4'
 	def normalize(self,name,price,code):
 		data = {}
-		data['id']=code.replace('-','').replace(' ','-').replace('(','-').replace(')','-').upper()
+		data['id']=''.join(c for c in code if c.isalnum())
+		data['id']=data['id'].upper()
 		data['title']=name
 		data['vendor']=name.split(' ',1)[0]#retrieving the vendor name, which is always at front
 		data['chipset']=(re.search(('[AHBQZX]([0-9])+'),name).group(0)) if (re.search(('[AHBQZX]([0-9])+'),name)) else 'not available'
 		data['price']=int(price.replace(',','')[3:]) #removing Rs. from 'Rs. 20000'
 		return data
 		
+class GPU:
+	def __init__(self,name,price,code,link):
+		data = self.normalize(name, price, code)
+		self.id = data['id'].upper()
+		self.title = data['title'].upper()
+		self.brand = data['brand']
+		self.vendor = data['vendor'].upper()
+		self.price = data['price']
+		isGPU = re.search(('((G|R)T(X)? [0-9]{3,})|(RX [0-9]{3})'),name)
+		isGPUid = re.search(('((G|R)T(X)?[0-9]{3,})|(RX[0-9]{3})'),self.id)
+		if(isGPU):
+			self.model=(re.search(('((G|R)T(X)? [0-9]{3,}(TI)?)|(RX [0-9]{3})'),name).group(0)) .replace(' ','')
+		elif(isGPUid):
+			self.model=(re.search(('((G|R)T(X)?[0-9]{3,}(TI)?)|(RX[0-9]{3})'),self.id).group(0))
+		else:
+			self.model='NA'
+		self.link=link
+	def __eq__(self, other):
+		return self.id == other.id
+	def __hash__(self):
+		return hash(self.id)
+	def normalize(self,name,price,code):
+		data = {}
+		data['price']=int(price.replace(',','')[3:])
+		data['id']=''.join(c for c in code if c.isalnum())
+		data['id']=data['id'][:40]
+		data['title']=name
+		data['vendor']=name.split(' ',1)[0]
+		data['brand'] = 'AMD' if re.search('RX [0-9]{3}',data['title']) else 'NVIDIA'
+		return data
 
 class CPU:
 	def __init__(self,name, price,link):
@@ -181,51 +250,51 @@ class CPU:
 	def getSocket(self):
 		socket = 'NA'
 		codename = 'NA'
-		if(self.brand=='INTEL'):
-			if(re.search(("2[0-7]{4}"),self.id)):
+		if self.brand=='INTEL':
+			if(re.search(("2[0-9]{3}"),self.id)):
 				socket = 'LGA 1155'
 				codename = 'Sandy Bridge'
-			elif(re.search(("3[0-7]{4}"),self.id)):
+			elif(re.search(("3[0-9]{3}"),self.id)):
 				socket = 'LGA 1155'
 				codename = 'Ivy Bridge'
-			elif(re.search(("4[0-7]{4}"),self.id)):
+			elif(re.search(("4[0-9]{3}"),self.id)):
 				socket = 'LGA 1150'
 				codename = 'Haswell'
-			elif(re.search(("5[0-7]{4}"),self.id)):
+			elif(re.search(("5[0-9]{3}"),self.id)):
 				socket = 'LGA 1150'
 				codename = 'Broadwell'
-			elif(re.search(("6[0-7]{4}"),self.id)):
+			elif(re.search(("6[0-9]{3}"),self.id)):
 				socket = 'LGA 1151'
 				codename = 'Skylake'
-			elif(re.search(("7[0-7]{4}"),self.id)):
+			elif(re.search(("7[0-9]{3}"),self.id)):
 				socket = 'LGA 1151'
 				codename = 'Kabylake'
-			elif(re.search(("8[0-9]{4}"),self.id)):
+			elif(re.search(("8[0-9]{3}"),self.id)):
 				socket = 'LGA 1151-2'
 				codename = 'Coffeelake'
-			elif(re.search(("9[0-9]{4}"),self.id)):
+			elif(re.search(("9[0-9]{3}"),self.id)):
 				socket = 'LGA 1151-2'
 				codename = 'Coffeelake'
-			elif(re.search(("3[8-9]{4}"),self.id)):
+			elif(re.search(("3[0-9]{3}"),self.id)):
 				socket = 'LGA 2011'
 				codename = 'Sandy Bridge-E'
-			elif(re.search(("4[8-9]{4}"),self.id)):
+			elif(re.search(("4[0-9]{3}"),self.id)):
 				socket = 'LGA 2011'
 				codename = 'Ivy Bridge-E'
-			elif(re.search(("5[8-9]{4}"),self.id)):
+			elif(re.search(("5[0-9]{3}"),self.id)):
 				socket = 'LGA 2011'
 				codename = 'Haswell-E'
-			elif(re.search(("6[8-9]{4}"),self.id)):
+			elif(re.search(("6[0-9]{3}"),self.id)):
 				socket = 'LGA 2011'
 				codename = 'Broadwell-E'
 		else:
-			if(re.search(("1[2-9]{3}"),self.id)):
+			if(re.search(("1[0-9]{3}"),self.id)):
 				socket = 'AM4'
 				codename = 'Summit Ridge'
-			elif(re.search(("2[2-9]{3}"),self.id)):
+			elif(re.search(("2[0-9]{3}"),self.id)):
 				socket = 'AM4'
 				codename = 'Pinnacle Ridge'
-		return socket.upper(),codename.upper()
+		return socket,codename.upper()
 
 	#function to normalize/parse the content of a CPU product title
 	def normalize(self,name, price):
@@ -253,9 +322,29 @@ def main():
 		passwd=config.passwd,
 		database=config.database
 	)
-
-	available_cpus, czone_cpus, pakdukaan_cpus, galaxy_cpus = CPUscrap()
-	available_mobos, czone_mobos,shingpoint_mobos = MOBOscrap()
+	distinct_cpus, all_cpus =  CPUscrap()
+	distinct_mobos, all_mobos = MOBOscrap()
+	distinct_gpus, all_gpus = GPUscrap()
+	#id, brand, desc, series, gen, socket, codename, unlocked for CPU
+	#id,brand,title,chipset,vendor,socket for MOBO
+	CPUdistinctinsert = []
+	MOBOdistinctinsert = []
+	GPUdistinctinsert = []
+	CPUallinsert=[]
+	MOBOallinsert=[]
+	GPUallinsert=[]
+	for cpu in distinct_cpus:
+		CPUdistinctinsert.append(tuple((cpu.id,cpu.brand,cpu.title,cpu.series,cpu.gen,cpu.socket,cpu.codename,cpu.unlocked)))
+	for mobo in distinct_mobos:
+		MOBOdistinctinsert.append(tuple((mobo.id,mobo.brand,mobo.title,mobo.chipset,mobo.vendor,mobo.socket)))
+	for gpu in distinct_gpus:
+		GPUdistinctinsert.append(tuple((gpu.id,gpu.title,gpu.model,gpu.brand,gpu.vendor)))
+	for gpu in all_gpus:
+		GPUallinsert.append(tuple((gpu.id,gpu.price,gpu.link)))
+	for cpu in all_cpus:
+		CPUallinsert.append(tuple((cpu.id,cpu.price,cpu.link)))
+	for mobo in all_mobos:
+		MOBOallinsert.append(tuple((mobo.id,mobo.price,mobo.link)))
 	try:
 		dbconn=mysql.connector.connect(
 		host=config.host,
@@ -263,22 +352,28 @@ def main():
 		passwd=config.passwd,
 		database=config.database
 		)
-		#id, brand, desc, series, gen, socket, codename, unlocked for CPU
-		#id,brand,title,chipset,vendor,socket for MOBO
-		CPUdata = []
-		MOBOdata = []
-		for cpu in available_cpus:
-			
-			CPUdata.append(tuple((cpu.id,cpu.brand,cpu.title,cpu.series,cpu.gen,cpu.socket,cpu.codename,cpu.unlocked)))
-		for mobo in available_mobos:
-			MOBOdata.append(tuple((mobo.id,mobo.brand,mobo.title,mobo.chipset,mobo.vendor,mobo.socket)))
-		
+	
 		CPUquery="INSERT INTO processor values(%s, %s, %s, %s, %s, %s, %s, %s)"
+		CPUpricesquery="INSERT INTO processor_prices values(%s, %s, %s)"
 		MOBOquery="INSERT INTO motherboard values(%s, %s, %s, %s, %s, %s)"
+		MOBOpricesquery="INSERT INTO motherboard_prices values(%s, %s, %s)"
+		GPUquery="INSERT INTO gpu values(%s, %s, %s, %s, %s)"
+		GPUpricesquery="INSERT INTO gpu_prices values(%s, %s, %s)"
 		cursor = dbconn.cursor(prepared=True)
-		result = cursor.executemany(CPUquery,CPUdata)
-		#print(cursor.rowcount() + " records inserted into processor")
-		result = cursor.executemany(MOBOquery,MOBOdata)
+		cursor.execute("set foreign_key_checks = 0")
+		cursor.execute("truncate motherboard")
+		cursor.execute("truncate motherboard_prices")
+		cursor.execute("truncate processor")
+		cursor.execute("truncate processor_prices")
+		cursor.execute("truncate gpu")
+		cursor.execute("truncate gpu_prices")
+		cursor.executemany(CPUquery,CPUdistinctinsert)
+		cursor.executemany(CPUpricesquery,CPUallinsert)
+		cursor.executemany(MOBOquery,MOBOdistinctinsert)
+		cursor.executemany(MOBOpricesquery,MOBOallinsert)
+		cursor.executemany(GPUquery,GPUdistinctinsert)
+		cursor.executemany(GPUpricesquery,GPUallinsert)
+		cursor.execute("set foreign_key_checks = 1")
 		dbconn.commit()
 		#print(cursor.rowcount()+ "records inserted into motherboard")
 	except mysql.connector.Error as error:
