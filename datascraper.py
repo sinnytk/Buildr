@@ -32,6 +32,8 @@ def CZONE(type,link):
 				products.append(MOBO(pn,pp,code,pl))
 			elif(type=="GPU"):
 				products.append(GPU(pn,pp,code,pl))
+			elif(type=="RAM"):
+				products.append(RAM(pn,pp,code,pl))
 
 
 	return products
@@ -102,6 +104,8 @@ def SHINGPOINT(type, link):
 				products.append(MOBO(pn,pp,code,pl))
 			elif(type=="GPU"):
 				products.append(GPU(pn,pp,code,pl))
+			elif(type=="RAM"):
+				products.append(RAM(pn,pp,code,pl))
 	return products
 def MOBOscrap():
 	links=['http://czone.com.pk/motherboards-pakistan-ppt.157.aspx','https://www.shingpoint.com.pk/motherboards-pakistan-ppt.10302.aspx']
@@ -116,7 +120,22 @@ def MOBOscrap():
 		_all.append(product)
 		distinct.add(product)
 	return distinct, _all
-
+def RAMscrap():
+	distinct=set()
+	_all = []
+	links = ['http://czone.com.pk/memory-module-ram-desktop-ddr4-memory-pakistan-pt.383.aspx','https://www.shingpoint.com.pk/memory-modules-desktop-ddr3-pakistan-pt.10483.aspx','https://www.shingpoint.com.pk/memory-modules-desktop-ddr4-pakistan-pt.19052.aspx','https://www.shingpoint.com.pk/memory-modules-gaming-ddr3-pakistan-pt.22933.aspx','https://www.shingpoint.com.pk/memory-modules-gaming-ddr4-pakistan-pt.19909.aspx']
+	czone_prices=CZONE('RAM',links[0])
+	shingpoint_prices=SHINGPOINT('RAM',links[1])
+	shingpoint_prices.extend(SHINGPOINT('RAM',links[2]))
+	shingpoint_prices.extend(SHINGPOINT('RAM',links[3]))
+	shingpoint_prices.extend(SHINGPOINT('RAM',links[4]))
+	for product in czone_prices:
+		_all.append(product)
+		distinct.add(product)
+	for product in shingpoint_prices:
+		_all.append(product)
+		distinct.add(product)
+	return distinct, _all
 def CPUscrap():
 	links = ['http://czone.com.pk/processors-pakistan-ppt.85.aspx','https://www.pakdukaan.com/pc-hardware-accessories/processors','https://www.galaxy.pk/pc-addons.html?cat=1276']
 	distinct = set()
@@ -198,7 +217,32 @@ class MOBO:
 		data['chipset']=(re.search(('[AHBQZX]([0-9])+'),name).group(0)) if (re.search(('[AHBQZX]([0-9])+'),name)) else 'not available'
 		data['price']=int(price.replace(',','')[3:]) #removing Rs. from 'Rs. 20000'
 		return data
-		
+class RAM:
+	def __init__(self,name,price,code,link):
+		data = self.normalize(name, price, code)
+		self.id = data['id'].upper()
+		self.title = data['title'].upper()
+		self.brand = data['brand']
+		self.price = data['price']
+		self.speed = data['speed']
+		self.rate = data['rate']
+		self.size = data['size']
+		self.link = link
+	def __eq__(self, other):
+		return self.id == other.id
+	def __hash__(self):
+		return hash(self.id)
+	def normalize(self,name,price,code):
+		data = {}
+		data['price']=int(price.replace(',','')[3:])
+		data['id']=''.join(c for c in code if c.isalnum())
+		data['title']=name
+		data['brand']=name.split(' ',1)[0]
+		data['speed'] = re.search(('[0-9]{4}'),name).group(0) + 'mhz'
+		data['rate'] = re.search(('(DDR)( )?[34]{1}'),name).group(0)
+		data['size'] = re.search((' [0-9]{1,2}( )?(gb|GB)'),name).group(0).replace(' ','')
+		return data
+
 class GPU:
 	def __init__(self,name,price,code,link):
 		data = self.normalize(name, price, code)
@@ -316,35 +360,37 @@ class CPU:
 
 	
 def main():
-	dbconn=mysql.connector.connect(
-		host=config.host,
-		user=config.user,
-		passwd=config.passwd,
-		database=config.database
-	)
 	distinct_cpus, all_cpus =  CPUscrap()
 	distinct_mobos, all_mobos = MOBOscrap()
 	distinct_gpus, all_gpus = GPUscrap()
+	distinct_rams, all_rams = RAMscrap()
 	#id, brand, desc, series, gen, socket, codename, unlocked for CPU
 	#id,brand,title,chipset,vendor,socket for MOBO
 	CPUdistinctinsert = []
 	MOBOdistinctinsert = []
 	GPUdistinctinsert = []
+	RAMdistinctinsert = []
 	CPUallinsert=[]
 	MOBOallinsert=[]
 	GPUallinsert=[]
+	RAMallinsert=[]
 	for cpu in distinct_cpus:
 		CPUdistinctinsert.append(tuple((cpu.id,cpu.brand,cpu.title,cpu.series,cpu.gen,cpu.socket,cpu.codename,cpu.unlocked)))
 	for mobo in distinct_mobos:
 		MOBOdistinctinsert.append(tuple((mobo.id,mobo.brand,mobo.title,mobo.chipset,mobo.vendor,mobo.socket)))
 	for gpu in distinct_gpus:
 		GPUdistinctinsert.append(tuple((gpu.id,gpu.title,gpu.model,gpu.brand,gpu.vendor)))
+	for ram in distinct_rams:
+		RAMdistinctinsert.append(tuple((ram.id,ram.title,ram.brand,ram.size,ram.rate,ram.speed)))
 	for gpu in all_gpus:
 		GPUallinsert.append(tuple((gpu.id,gpu.price,gpu.link)))
 	for cpu in all_cpus:
 		CPUallinsert.append(tuple((cpu.id,cpu.price,cpu.link)))
 	for mobo in all_mobos:
 		MOBOallinsert.append(tuple((mobo.id,mobo.price,mobo.link)))
+	for ram in all_rams:
+		RAMallinsert.append(tuple((ram.id,ram.price,ram.link)))
+	
 	try:
 		dbconn=mysql.connector.connect(
 		host=config.host,
@@ -359,6 +405,8 @@ def main():
 		MOBOpricesquery="INSERT INTO motherboard_prices values(%s, %s, %s)"
 		GPUquery="INSERT INTO gpu values(%s, %s, %s, %s, %s)"
 		GPUpricesquery="INSERT INTO gpu_prices values(%s, %s, %s)"
+		RAMquery = "INSERT INTO ram values(%s, %s, %s, %s, %s,%s)"
+		RAMpricesquery="INSERT INTO ram_prices values(%s, %s, %s)"
 		cursor = dbconn.cursor(prepared=True)
 		cursor.execute("set foreign_key_checks = 0")
 		cursor.execute("truncate motherboard")
@@ -367,12 +415,18 @@ def main():
 		cursor.execute("truncate processor_prices")
 		cursor.execute("truncate gpu")
 		cursor.execute("truncate gpu_prices")
+		cursor.execute("truncate ram")
+		cursor.execute("truncate ram_prices")
+		dbconn.commit()
 		cursor.executemany(CPUquery,CPUdistinctinsert)
 		cursor.executemany(CPUpricesquery,CPUallinsert)
 		cursor.executemany(MOBOquery,MOBOdistinctinsert)
 		cursor.executemany(MOBOpricesquery,MOBOallinsert)
 		cursor.executemany(GPUquery,GPUdistinctinsert)
 		cursor.executemany(GPUpricesquery,GPUallinsert)
+		cursor.executemany(RAMquery,RAMdistinctinsert)
+		cursor.executemany(RAMpricesquery,RAMallinsert)
+
 		cursor.execute("set foreign_key_checks = 1")
 		dbconn.commit()
 		#print(cursor.rowcount()+ "records inserted into motherboard")
