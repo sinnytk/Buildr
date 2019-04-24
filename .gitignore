@@ -1,3 +1,7 @@
 #don't track the content of these files/folders
 __pycache__/
-config.py
+Scraper/config.py
+Scraper/__pycache__/
+bin/
+include/
+lib/
