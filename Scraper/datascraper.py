@@ -21,19 +21,21 @@ def CZONE(type,link):
 		soup = BeautifulSoup(req.content, "html.parser")
 		for product in range(len(soup.find_all("div",class_="product"))):
 			pn='rptListView_ctl0'+str(product)+'_anProductName'
+			pi='rptListView_ctl0'+str(product)+'_imgProduct'
 			pl="https://www.czone.com.pk"+soup.find(id=pn)['href']
 			pn = soup.find(id=pn).text.strip()
 			pp='rptListView_ctl0'+str(product)+'_spnPrice'
 			pp = soup.find(id=pp).text.strip()
+			pi="https://czone.com.pk"+soup.find(id=pi)['src']
 			code=soup.find(id='rptListView_ctl0'+str(product)+'_spnProductCode').text.strip()
 			if(type=='CPU'):
-				products.append(CPU(pn,pp,pl))
+				products.append(CPU(pn,pp,pl,pi))
 			elif(type=='MOBO'):
-				products.append(MOBO(pn,pp,code,pl))
+				products.append(MOBO(pn,pp,code,pl,pi))
 			elif(type=="GPU"):
-				products.append(GPU(pn,pp,code,pl))
+				products.append(GPU(pn,pp,code,pl,pi))
 			elif(type=="RAM"):
-				products.append(RAM(pn,pp,code,pl))
+				products.append(RAM(pn,pp,code,pl,pi))
 
 
 	return products
@@ -52,12 +54,13 @@ def PAKDUKAAN(type,link):
 			pl=p.a['href']
 			pn=p.a['title'].strip().replace(u"\u2122", '').replace(u"\u00AE",'')
 			pp=product.find("span",class_="price").text.strip()
+			pi=product.img['src']
 			if(type=="CPU"):
-				products.append(CPU(pn,pp,pl))
+				products.append(CPU(pn,pp,pl,pi))
 			elif(type=="GPU"):
 				tempsoup = BeautifulSoup((requests.get(pl)).content,'html.parser')
 				code=tempsoup.find("h3",class_="product-shop-sku").strong.text.strip()
-				products.append(GPU(pn,pp,code,pl))
+				products.append(GPU(pn,pp,code,pl,pi))
 	return products
 def GALAXY(type, link):
 	products = []
@@ -72,12 +75,13 @@ def GALAXY(type, link):
 		productlist = soup.find_all("li",class_="product-item")
 		productlist=productlist[1:]
 		for product in productlist:
+			pi=product.img['src']
 			p=product.find("a",class_="product-item-link")
 			pl=p['href']
 			pn=p.text.strip()
 			pp=product.find("span",class_="price").text
 			pp=pp[:-3]
-			products.append(CPU(pn,pp,pl))
+			products.append(CPU(pn,pp,pl,pi))
 	return products
 def SHINGPOINT(type, link):
 	products = []
@@ -100,12 +104,14 @@ def SHINGPOINT(type, link):
 			pp='rptListView_ctl0'+str(product)+'_spnPrice'
 			pp = soup.find(id=pp).text.strip()
 			code = tempsoup.find(id='spnProductCode').text.strip()
+			pi='rptListView_ctl0'+str(product)+'_imgProduct'
+			pi="https://shingpoint.com.pk"+soup.find(id=pi)['src']
 			if(type=="MOBO"):
-				products.append(MOBO(pn,pp,code,pl))
+				products.append(MOBO(pn,pp,code,pl,pi))
 			elif(type=="GPU"):
-				products.append(GPU(pn,pp,code,pl))
+				products.append(GPU(pn,pp,code,pl,pi))
 			elif(type=="RAM"):
-				products.append(RAM(pn,pp,code,pl))
+				products.append(RAM(pn,pp,code,pl,pi))
 	return products
 def MOBOscrap():
 	links=['http://czone.com.pk/motherboards-pakistan-ppt.157.aspx','https://www.shingpoint.com.pk/motherboards-pakistan-ppt.10302.aspx']
@@ -176,9 +182,10 @@ def GPUscrap():
 	return distinct, _all
 
 class MOBO:
-	def __init__(self,name, price,code,link):
+	def __init__(self,name, price,code,link,image):
 		data = self.normalize(name, price, code)
 		self.id = data['id'].upper()
+		self.image=image
 		self.title = data['title'].upper()
 		self.chipset=data['chipset'].upper()
 		self.link=link
@@ -218,11 +225,12 @@ class MOBO:
 		data['price']=int(price.replace(',','')[3:]) #removing Rs. from 'Rs. 20000'
 		return data
 class RAM:
-	def __init__(self,name,price,code,link):
+	def __init__(self,name,price,code,link,image):
 		data = self.normalize(name, price, code)
 		self.id = data['id'].upper()
 		self.title = data['title'].upper()
 		self.brand = data['brand']
+		self.image=image
 		self.price = data['price']
 		self.speed = data['speed']
 		self.rate = data['rate']
@@ -244,9 +252,10 @@ class RAM:
 		return data
 
 class GPU:
-	def __init__(self,name,price,code,link):
+	def __init__(self,name,price,code,link,image):
 		data = self.normalize(name, price, code)
 		self.id = data['id'].upper()
+		self.image=image
 		self.title = data['title'].upper()
 		self.brand = data['brand']
 		self.vendor = data['vendor'].upper()
@@ -275,9 +284,10 @@ class GPU:
 		return data
 
 class CPU:
-	def __init__(self,name, price,link):
+	def __init__(self,name, price,link,image):
 		data = self.normalize(name, price)
 		self.id = data['id'].upper()
+		self.image=image
 		self.title = data['title'].upper()
 		self.brand = data['brand'].upper()
 		self.series = data['series'].upper()
@@ -364,24 +374,30 @@ def main():
 	distinct_mobos, all_mobos = MOBOscrap()
 	distinct_gpus, all_gpus = GPUscrap()
 	distinct_rams, all_rams = RAMscrap()
+	
 	#id, brand, desc, series, gen, socket, codename, unlocked for CPU
 	#id,brand,title,chipset,vendor,socket for MOBO
 	CPUdistinctinsert = []
 	MOBOdistinctinsert = []
 	GPUdistinctinsert = []
 	RAMdistinctinsert = []
+	products = []
 	CPUallinsert=[]
 	MOBOallinsert=[]
 	GPUallinsert=[]
 	RAMallinsert=[]
 	for cpu in distinct_cpus:
-		CPUdistinctinsert.append(tuple((cpu.id,cpu.brand,cpu.title,cpu.series,cpu.gen,cpu.socket,cpu.codename,cpu.unlocked)))
+		CPUdistinctinsert.append(tuple((cpu.id,cpu.brand,cpu.series,cpu.gen,cpu.socket,cpu.codename,cpu.unlocked,cpu.image,0)))
+		products.append(tuple((cpu.id,cpu.title,'CPU',cpu.image)))
 	for mobo in distinct_mobos:
-		MOBOdistinctinsert.append(tuple((mobo.id,mobo.brand,mobo.title,mobo.chipset,mobo.vendor,mobo.socket)))
+		MOBOdistinctinsert.append(tuple((mobo.id,mobo.brand,mobo.chipset,mobo.vendor,mobo.socket,mobo.image,0)))
+		products.append(tuple((mobo.id,mobo.title,'MOBO',mobo.image)))
 	for gpu in distinct_gpus:
-		GPUdistinctinsert.append(tuple((gpu.id,gpu.title,gpu.model,gpu.brand,gpu.vendor)))
+		GPUdistinctinsert.append(tuple((gpu.id,gpu.model,gpu.brand,gpu.vendor,gpu.image,0)))
+		products.append(tuple((gpu.id,gpu.title,'GPU',gpu.image)))
 	for ram in distinct_rams:
-		RAMdistinctinsert.append(tuple((ram.id,ram.title,ram.brand,ram.size,ram.rate,ram.speed)))
+		RAMdistinctinsert.append(tuple((ram.id,ram.brand,ram.size,ram.rate,ram.speed,ram.image,0)))
+		products.append(tuple((ram.id,ram.title,'RAM',ram.image)))
 	for gpu in all_gpus:
 		GPUallinsert.append(tuple((gpu.id,gpu.price,gpu.link)))
 	for cpu in all_cpus:
@@ -390,6 +406,7 @@ def main():
 		MOBOallinsert.append(tuple((mobo.id,mobo.price,mobo.link)))
 	for ram in all_rams:
 		RAMallinsert.append(tuple((ram.id,ram.price,ram.link)))
+
 	
 	try:
 		dbconn=mysql.connector.connect(
@@ -399,14 +416,15 @@ def main():
 		database=config.database
 		)
 	
-		CPUquery="INSERT INTO processor values(%s, %s, %s, %s, %s, %s, %s, %s)"
+		CPUquery="INSERT INTO processor values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 		CPUpricesquery="INSERT INTO processor_prices values(%s, %s, %s)"
-		MOBOquery="INSERT INTO motherboard values(%s, %s, %s, %s, %s, %s)"
+		MOBOquery="INSERT INTO motherboard values(%s, %s, %s, %s, %s, %s, %s)"
 		MOBOpricesquery="INSERT INTO motherboard_prices values(%s, %s, %s)"
-		GPUquery="INSERT INTO gpu values(%s, %s, %s, %s, %s)"
+		GPUquery="INSERT INTO gpu values(%s, %s, %s, %s, %s, %s)"
 		GPUpricesquery="INSERT INTO gpu_prices values(%s, %s, %s)"
-		RAMquery = "INSERT INTO ram values(%s, %s, %s, %s, %s,%s)"
+		RAMquery = "INSERT INTO ram values(%s, %s, %s, %s, %s,%s, %s)"
 		RAMpricesquery="INSERT INTO ram_prices values(%s, %s, %s)"
+		PRODUCTSquery="INSERT INTO product values(%s,%s,%s,%s)"
 		cursor = dbconn.cursor(prepared=True)
 		cursor.execute("set foreign_key_checks = 0")
 		cursor.execute("truncate motherboard")
@@ -417,6 +435,7 @@ def main():
 		cursor.execute("truncate gpu_prices")
 		cursor.execute("truncate ram")
 		cursor.execute("truncate ram_prices")
+		cursor.execute("truncate product")
 		dbconn.commit()
 		cursor.executemany(CPUquery,CPUdistinctinsert)
 		cursor.executemany(CPUpricesquery,CPUallinsert)
@@ -426,6 +445,12 @@ def main():
 		cursor.executemany(GPUpricesquery,GPUallinsert)
 		cursor.executemany(RAMquery,RAMdistinctinsert)
 		cursor.executemany(RAMpricesquery,RAMallinsert)
+		cursor.executemany(PRODUCTSquery,products)
+		cursor.execute("update ram set min_price = (select min(price) from ram_prices where ram_prices.id = ram.id)")
+		cursor.execute("update processor set min_price = (select min(price) from processor_prices where processor_prices.id = processor.id)")
+		cursor.execute("update motherboard set min_price = (select min(price) from motherboard_prices where motherboard_prices.id = motherboard.id)")
+		cursor.execute("update gpu set min_price = (select min(price) from gpu_prices where gpu_prices.id = gpu.id)")
+		
 
 		cursor.execute("set foreign_key_checks = 1")
 		dbconn.commit()
