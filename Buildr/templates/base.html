@@ -1,0 +1,26 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Buildr - Tarun, Akhmas</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href="{% static 'css/uikit.min.css' %}">
+    <script src="{% static 'js/uikit.min.js' %}"></script>
+    <script src="{% static 'js/uikit-icons.js' %}"></script>
+</head>
+<body>
+    <nav class="uk-navbar-container" uk-navbar>
+        <div class="uk-navbar-left"> <a class="uk-navbar-item uk-logo" href="#">Logo</a></div>
+        <div class="uk-navbar-center uk-visible@s">
+            <ul class="uk-navbar-nav">
+                <li uk-navbar-item {% if request.path  == '/' %} class = 'uk-active'{% endif %}><a href="#">Home</a></li>
+                <li uk-navbar-item {% if request.path  == '/build' %}class = 'uk-active'{% endif %}><a href="#">Build</a></li>
+            </ul>
+        </div>
+    </nav>
+{% block content %}
+{% endblock %}        
+</body>
+</html>
