@@ -9,7 +9,10 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-from ...Scraper import config
+from .config import host as config_host
+from .config import user as config_user
+from .config import passwd as config_passwd
+from .config import database as config_database
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -83,10 +86,10 @@ WSGI_APPLICATION = 'Buildr.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.mysql',
-        'NAME':config.database,
-        'USER':config.user,
-        'PASSWORD':config.passwd,
-        'HOST':config.host,
+        'NAME':config_database,
+        'USER':config_user,
+        'PASSWORD':config_passwd,
+        'HOST':config_host,
         'PORT':''
     }
 }
