@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+from ...Scraper import config
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'product',
 ]
 
 MIDDLEWARE = [
@@ -82,10 +83,10 @@ WSGI_APPLICATION = 'Buildr.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.mysql',
-        'NAME':'buildrtest',
-        'USER':'root',
-        'PASSWORD':'tarunkumar',
-        'HOST':'localhost',
+        'NAME':config.database,
+        'USER':config.user,
+        'PASSWORD':config.passwd,
+        'HOST':config.host,
         'PORT':''
     }
 }
