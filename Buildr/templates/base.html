@@ -15,8 +15,8 @@
         <div class="uk-navbar-left"> <a class="uk-navbar-item uk-logo" href="#">Logo</a></div>
         <div class="uk-navbar-center uk-visible@s">
             <ul class="uk-navbar-nav">
-                <li uk-navbar-item {% if request.path  == '/' %} class = 'uk-active'{% endif %} ><a href="#"><span uk-margin-small-right uk-icon="icon: home"></span>Home</a></li>
-                <li uk-navbar-item {% if request.path  == '/Build' %}class = 'uk-active'{% endif %}><a href="#"><span uk-margin-small-right uk-icon="icon: desktop"></span>Build</a></li>
+                <li uk-navbar-item {% if request.path  == '/' %} class = 'uk-active'{% endif %} ><a href="/"><span uk-margin-small-right uk-icon="icon: home"></span>Home</a></li>
+                <li uk-navbar-item {% if request.path  == '/build' %}class = 'uk-active'{% endif %}><a href="/build"><span uk-margin-small-right uk-icon="icon: desktop"></span>Build</a></li>
             </ul>
         </div>
     </nav>
