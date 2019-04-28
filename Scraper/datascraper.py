@@ -392,16 +392,16 @@ def main():
 	RAMallinsert=[]
 	for cpu in distinct_cpus:
 		CPUdistinctinsert.append(tuple((cpu.id,cpu.brand,cpu.series,cpu.gen,cpu.socket,cpu.codename,cpu.unlocked,cpu.image,0)))
-		products.append(tuple((cpu.id,cpu.title,'CPU',cpu.image)))
+		products.append(tuple((cpu.id,cpu.title,'CPU',cpu.image,0)))
 	for mobo in distinct_mobos:
 		MOBOdistinctinsert.append(tuple((mobo.id,mobo.brand,mobo.chipset,mobo.vendor,mobo.socket,mobo.image,0)))
-		products.append(tuple((mobo.id,mobo.title,'MOBO',mobo.image)))
+		products.append(tuple((mobo.id,mobo.title,'MOBO',mobo.image,0)))
 	for gpu in distinct_gpus:
 		GPUdistinctinsert.append(tuple((gpu.id,gpu.model,gpu.brand,gpu.vendor,gpu.image,0)))
-		products.append(tuple((gpu.id,gpu.title,'GPU',gpu.image)))
+		products.append(tuple((gpu.id,gpu.title,'GPU',gpu.image,0)))
 	for ram in distinct_rams:
 		RAMdistinctinsert.append(tuple((ram.id,ram.brand,ram.size,ram.rate,ram.speed,ram.image,0)))
-		products.append(tuple((ram.id,ram.title,'RAM',ram.image)))
+		products.append(tuple((ram.id,ram.title,'RAM',ram.image,0)))
 	for gpu in all_gpus:
 		GPUallinsert.append(tuple((gpu.id,gpu.price,gpu.link,gpu.seller)))
 	for cpu in all_cpus:
@@ -420,15 +420,15 @@ def main():
 		database=config.database
 		)
 	
-		CPUquery="INSERT INTO processor values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-		CPUpricesquery="INSERT INTO processor_prices values(%s, %s, %s, %s)"
+		CPUquery="INSERT INTO processor values(%s, %s, %s, %s, %s, %s, %s, %s, %s)" #found this awesome way to REPLACE duplicates, which occur many times thanks to dumb listings on sites.
+		CPUpricesquery="INSERT IGNORE INTO processor_prices values(%s, %s, %s, %s)"
 		MOBOquery="INSERT INTO motherboard values(%s, %s, %s, %s, %s, %s, %s)"
-		MOBOpricesquery="INSERT INTO motherboard_prices values(%s, %s, %s, %s)"
+		MOBOpricesquery="INSERT IGNORE INTO motherboard_prices values(%s, %s, %s, %s)"
 		GPUquery="INSERT INTO gpu values(%s, %s, %s, %s, %s, %s)"
-		GPUpricesquery="INSERT INTO gpu_prices values(%s, %s, %s, %s)"
+		GPUpricesquery="INSERT IGNORE INTO gpu_prices values(%s, %s, %s, %s)"
 		RAMquery = "INSERT INTO ram values(%s, %s, %s, %s, %s,%s, %s)"
-		RAMpricesquery="INSERT INTO ram_prices values(%s, %s, %s, %s)"
-		PRODUCTSquery="INSERT INTO product values(%s,%s,%s,%s)"
+		RAMpricesquery="INSERT IGNORE INTO ram_prices values(%s, %s, %s, %s)"
+		PRODUCTSquery="INSERT INTO product values(%s,%s,%s,%s,%s)"
 		cursor = dbconn.cursor(prepared=True)
 		cursor.execute("set foreign_key_checks = 0")
 		cursor.execute("truncate motherboard")
@@ -454,11 +454,14 @@ def main():
 		cursor.execute("update processor set min_price = (select min(price) from processor_prices where processor_prices.id = processor.id)")
 		cursor.execute("update motherboard set min_price = (select min(price) from motherboard_prices where motherboard_prices.id = motherboard.id)")
 		cursor.execute("update gpu set min_price = (select min(price) from gpu_prices where gpu_prices.id = gpu.id)")
-		
-
+		cursor.execute("create temporary table idprice(id varchar(40), price int(6))")
+		cursor.execute("insert into idprice (select id, min_price from ram)")
+		cursor.execute("insert into idprice (select id, min_price from processor)")
+		cursor.execute("insert into idprice (select id, min_price from motherboard)")
+		cursor.execute("insert into idprice (select id, min_price from gpu)")
+		cursor.execute("update product set min_price = (select price from idprice where idprice.id=product.id)")
 		cursor.execute("set foreign_key_checks = 1")
 		dbconn.commit()
-		#print(cursor.rowcount()+ "records inserted into motherboard")
 	except mysql.connector.Error as error:
 		print("Fail {}".format(error))
 	finally:
