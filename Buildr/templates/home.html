@@ -1,4 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
-
+<nav class="uk-navbar-container uk-navbar-transparent " uk-navbar>   
+    <div class="uk-navbar-center uk-visible@s">
+        <div>
+            <ul class="uk-navbar-nav">
+                <li class="uk-navbar-item {% if request.path == '/products/rams' %}uk-active{% endif %}"><a href="/">RAMS</a></li>
+                <li class="uk-navbar-item {% if request.path == '/products/cpu' %}uk-active{% endif %}"><a href="/">PROCESSORS</a></li>
+                <li class="uk-navbar-item {% if request.path == '/' %}uk-active{% endif %}"><a href="/">ALL</a></li>
+                <li class="uk-navbar-item {% if request.path == '/products/gpu' %}uk-active{% endif %}"><a href="/">GRAPHIC CARDS</a></li>
+                <li class="uk-navbar-item {% if request.path == '/products/mobo' %}uk-active{% endif %}"><a href="/">MOTHERBOARDS</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="uk-card uk-card-default uk-grid-collapse uk-child-width-1-2@s uk-margin" uk-grid>
+    {% for product in all_products %}
+        <div class="uk-card-media-left uk-cover-container">
+            <img src="{{product.image}}" alt="">
+            <canvas width="400" height="100"></canvas>
+        </div>
+        <div>
+            <div class="uk-card-body">
+                <h3 class="uk-card-title">{{product.title}}</h3>
+                <p>{{product.min_price}}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<!-- <ul class='uk-list uk-list-striped'>
+    {% for product in all_products %}
+        <li>{{ product.id }} {{ product.title }} {{product.min_price}}</li>
+    {% endfor %}
+</ul> -->
 {% endblock %}

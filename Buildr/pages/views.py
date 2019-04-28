@@ -1,5 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from product.models import Product
 def home_view(request, *args, **kwargs):
-    print(request.path)
-    return render(request,"home.html",{})
+    context = {
+        'all_products':Product.objects.all()
+    }
+    
+    return render(request,"home.html",context)

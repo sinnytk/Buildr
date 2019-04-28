@@ -11,8 +11,6 @@ class Gpu(models.Model):
     class Meta:
         managed = False
         db_table = 'gpu'
-    def __str__(self):
-        return (self.id + ' ' +  self.model  + ' ' + self.vendor )
 
 
 class GpuPrices(models.Model):
@@ -20,12 +18,11 @@ class GpuPrices(models.Model):
     price = models.IntegerField(blank=True, null=True)
     link = models.CharField(max_length=200)
     seller = models.CharField(max_length=20)
+
     class Meta:
         managed = False
         db_table = 'gpu_prices'
-        unique_together = (('id', 'seller'))
-    def __str__(self):
-        return (self.id.id + ' ' + self.seller)
+        unique_together = (('id', 'seller'),)
 
 
 class Motherboard(models.Model):
@@ -40,8 +37,6 @@ class Motherboard(models.Model):
     class Meta:
         managed = False
         db_table = 'motherboard'
-    def __str__(self):
-        return (self.id + ' ' +  self.chipset  + ' ' + self.vendor)
 
 
 class MotherboardPrices(models.Model):
@@ -49,12 +44,11 @@ class MotherboardPrices(models.Model):
     price = models.IntegerField(blank=True, null=True)
     link = models.CharField(max_length=200)
     seller = models.CharField(max_length=20)
+
     class Meta:
         managed = False
         db_table = 'motherboard_prices'
-        unique_together = (('id', 'seller'))
-    def __str__(self):
-        return (self.id.id + ' ' + self.seller)
+        unique_together = (('id', 'seller'),)
 
 
 class Processor(models.Model):
@@ -71,9 +65,6 @@ class Processor(models.Model):
     class Meta:
         managed = False
         db_table = 'processor'
-    def __str__(self):
-        return (self.id)
-    
 
 
 class ProcessorPrices(models.Model):
@@ -81,12 +72,11 @@ class ProcessorPrices(models.Model):
     price = models.IntegerField(blank=True, null=True)
     link = models.CharField(max_length=200)
     seller = models.CharField(max_length=20)
+
     class Meta:
         managed = False
         db_table = 'processor_prices'
-        unique_together = (('id', 'seller'))
-    def __str__(self):
-        return (self.id.id + ' ' + self.seller)
+        unique_together = (('id', 'seller'),)
 
 
 class Product(models.Model):
@@ -94,12 +84,11 @@ class Product(models.Model):
     title = models.CharField(max_length=300, blank=True, null=True)
     category = models.CharField(max_length=30, blank=True, null=True)
     image = models.CharField(max_length=300, blank=True, null=True)
+    min_price = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'product'
-    def __str__(self):
-        return (self.title)
 
 
 class Ram(models.Model):
@@ -114,18 +103,15 @@ class Ram(models.Model):
     class Meta:
         managed = False
         db_table = 'ram'
-    def __str__(self):
-        return (self.id + ' ' + self.brand + ' ' + self.size + ' ' + self.speed )
 
 
 class RamPrices(models.Model):
     id = models.ForeignKey(Ram, models.DO_NOTHING, db_column='id', primary_key=True)
     price = models.IntegerField(blank=True, null=True)
     link = models.CharField(max_length=200)
-    seller = models.CharField(max_length=20)
+    seller = models.CharField(max_length=20, blank=True, null=True)
+
     class Meta:
         managed = False
         db_table = 'ram_prices'
-        unique_together = (('id', 'seller'))
-    def __str__(self):
-        return (self.id.id + ' ' + self.seller)
+        unique_together = (('id', 'link'),)
