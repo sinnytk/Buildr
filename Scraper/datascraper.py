@@ -378,7 +378,8 @@ def main():
 	dbconn = mysql.connector.connect(host=config.host,user=config.user,passwd=config.passwd)
 	cursor=dbconn.cursor()
 	cursor.execute("CREATE DATABASE IF NOT EXISTS buildrtest")
-	system("mysql -u root -p"+config.passwd+" buildrtest < "+ path.abspath(path.join(path.dirname(__file__),'..','db.sql')))
+	sqlfile=path.abspath(path.join(path.dirname(__file__),'..','db.sql'))
+	system("mysql -u root -p"+config.passwd+' buildrtest < "'+sqlfile+'"')
 	cursor.close()
 	dbconn.close()
 
