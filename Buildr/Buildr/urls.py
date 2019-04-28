@@ -17,10 +17,18 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from pages.views import home_view
+from pages.views import products_ram_view
+from pages.views import products_cpu_view
+from pages.views import products_mobo_view
+from pages.views import products_gpu_view
 from product.views import product_detail_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',home_view,name='home'),
-    path('product/',product_detail_view)
+    path('product/',product_detail_view),
+    path('products/ram',products_ram_view),
+    path('products/gpu',products_gpu_view),
+    path('products/cpu',products_cpu_view),
+    path('products/mobo',products_mobo_view),
 ]
 urlpatterns+=staticfiles_urlpatterns()
