@@ -1,7 +1,7 @@
 import requests
 import re
 import config #contains the details for the database connection
-import csv
+from os import system, path
 import mysql.connector
 from bs4 import BeautifulSoup
 
@@ -374,6 +374,15 @@ class CPU:
 
 	
 def main():
+	#creating the database so that connectivity over other devices is possible
+	dbconn = mysql.connector.connect(host=config.host,user=config.user,passwd=config.passwd)
+	cursor=dbconn.cursor()
+	cursor.execute("CREATE DATABASE IF NOT EXISTS buildrtest")
+	system("mysql -u root -p"+config.passwd+" buildrtest < "+ path.abspath(path.join(path.dirname(__file__),'..','db.sql')))
+	cursor.close()
+	dbconn.close()
+
+	#creating list for distinct products and for prices w.r.t seller for each
 	distinct_cpus, all_cpus =  CPUscrap()
 	distinct_mobos, all_mobos = MOBOscrap()
 	distinct_gpus, all_gpus = GPUscrap()
