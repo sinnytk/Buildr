@@ -439,7 +439,7 @@ def main():
 		RAMquery = "INSERT INTO ram values(%s, %s, %s, %s, %s,%s, %s)"
 		RAMpricesquery="INSERT IGNORE INTO ram_prices values(%s, %s, %s, %s)"
 		PRODUCTSquery="INSERT INTO product values(%s,%s,%s,%s,%s)"
-		cursor = dbconn.cursor(prepared=True)
+		cursor = dbconn.cursor()
 		cursor.execute("set foreign_key_checks = 0")
 		cursor.execute("truncate motherboard")
 		cursor.execute("truncate motherboard_prices")
