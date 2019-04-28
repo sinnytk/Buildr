@@ -9,6 +9,9 @@
     <link rel='stylesheet' type='text/css' media='screen' href="{% static 'css/uikit.min.css' %}">
     <script src="{% static 'js/uikit.min.js' %}"></script>
     <script src="{% static 'js/uikit-icons.js' %}"></script>
+    <script>window.onbeforeunload = function () {
+        window.scrollTo(0, 0);
+      }</script>
 </head>
 <body>
     <nav class="uk-navbar-container" uk-navbar>
