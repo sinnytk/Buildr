@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from pages.views import home_view
 from pages.views import products_ram_view
@@ -25,7 +25,7 @@ from product.views import product_detail_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',home_view,name='home'),
-    path('product/',product_detail_view),
+    re_path(r'^product/(ram|gpu|cpu|mobo)/(?P<id>\w+)/$', product_detail_view),
     path('products/ram',products_ram_view),
     path('products/gpu',products_gpu_view),
     path('products/cpu',products_cpu_view),
