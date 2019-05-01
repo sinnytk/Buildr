@@ -18,17 +18,18 @@
 {% for product in all_products %}
 {% if forloop.first %}<div class="uk-grid-match uk-child-width-expand@s uk-text-center uk-margin-left uk-margin-right uk-margin-top" uk-grid>{% endif %}
     <div>
-        <div class="uk-card uk-card-hover uk-card-default uk-card-body">
+        <a href="/product/{{product.category|lower}}/{{product.id}}/" class="uk-link-muted"><div class="uk-card uk-card-hover uk-card-default uk-card-body">
             <div class="uk-card-header" style="width:auto;height:7em">
                 <img style="object-fit:contain; width: inherit; height: inherit;" src="{{product.image}}">
             </div>
             <div class="uk-card-body">
-                <p>{{product.title|truncatewords:5 }}</p>
+                <p>{{product.title|truncatechars:40 }}</p>
             </div>
             <div class="uk-card-footer">
+                <p class="uk-text-meta uk-align-center" >Lowest price</p>
                 <h2>{{product.min_price}}</h2>
             </div>
-        </div>
+        </div></a>
      </div>
     {% if forloop.counter|divisibleby:4 %}</div><div class="uk-grid-match uk-child-width-expand@s uk-text-center uk-margin-left uk-margin-right uk-margin-top" uk-grid>{% endif %}
     {% if forloop.last %}</div>{% endif %}
