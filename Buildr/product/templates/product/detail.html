@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<ul>
-    <li>{{ object.id }}</li>
-    <li>{{ object.title }}</li>
-    <li>{{ object.image }}</li>
-    <li><img src="{{ object.image }}" alt="product photo"></li>
-</ul>
+<div class="uk-card uk-card-default uk-grid-collapse  uk-margin-left uk-margin-top" uk-grid>
+    <div class="uk-cover-container">
+        <img class="uk-margin-left uk-margin-top" src="{{object.image}}" alt="product-image" >
+    </div>
+    <div>
+        <div class="uk-card-body">
+            <h3 class="uk-card-title">{{object.title}}</h3>
+            {% for price in prices %}
+            <div>{{price.price}} <a href="{{price.link}}">{{price.seller}}</a></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}
