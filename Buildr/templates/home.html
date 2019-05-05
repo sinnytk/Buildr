@@ -13,7 +13,17 @@
         </div>
     </div>
 </nav>
-</div>
+<nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
+    <form class="uk-navbar-center" action="" method="POST">{% csrf_token %}
+            <select name = "sort" class="uk-select" onchange="this.form.submit()">
+                <option {% if sortvalue == 0 %}selected{% endif %} disabled value="0">Sort by</option>
+                <option {% if sortvalue == 1 %}selected{% endif %} value="1">Price - ASC</option>
+                <option {% if sortvalue == 2 %}selected{% endif %} value="2">Price - DESC</option>
+                <option {% if sortvalue == 3 %}selected{% endif %} value="3">Title - ASC</option>
+                <option {% if sortvalue == 4 %}selected{% endif %} value="4">Title - DESC</option>
+            </select>
+    </form>
+</nav>
 <!-- Thank god https://stackoverflow.com/a/22466415 for the perfect solution to iterating over the list and creating only 4 items -->
 {% for product in all_products %}
 {% if forloop.first %}<div class="uk-grid-match uk-child-width-expand@s uk-text-center uk-margin-left uk-margin-right uk-margin-top" uk-grid>{% endif %}
