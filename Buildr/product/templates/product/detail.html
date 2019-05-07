@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="uk-container-large">
+<div>
     <div class="uk-card-media-top">
         <img src="{{object.image}}" alt="product-image" class="uk-margin-top uk-align-center">
         <h4 class="uk-heading-line uk-text-center"><span>{{object.title}}</span></h4>
-        <div class="uk-card uk-card-body uk-card-secondary">
+        <div class="uk-align-center uk-card uk-card-body uk-card-secondary">
             <p class="uk-text-center uk-card-title">Available vendors</p>
             <ul class="uk-list uk-margin-top uk-text-center">
             {% for p in prices %}
