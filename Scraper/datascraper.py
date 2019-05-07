@@ -375,6 +375,13 @@ class CPU:
 	
 def main():
 	#creating the database so that connectivity over other devices is possible
+
+	#creating list for distinct products and for prices w.r.t seller for each
+	distinct_cpus, all_cpus =  CPUscrap()
+	distinct_mobos, all_mobos = MOBOscrap()
+	distinct_gpus, all_gpus = GPUscrap()
+	distinct_rams, all_rams = RAMscrap()
+
 	dbconn = mysql.connector.connect(host=config.host,user=config.user,passwd=config.passwd)
 	cursor=dbconn.cursor()
 	cursor.execute("CREATE DATABASE IF NOT EXISTS buildrtest")
@@ -382,12 +389,6 @@ def main():
 	system("mysql -u root -p"+config.passwd+' buildrtest < "'+sqlfile+'"')
 	cursor.close()
 	dbconn.close()
-
-	#creating list for distinct products and for prices w.r.t seller for each
-	distinct_cpus, all_cpus =  CPUscrap()
-	distinct_mobos, all_mobos = MOBOscrap()
-	distinct_gpus, all_gpus = GPUscrap()
-	distinct_rams, all_rams = RAMscrap()
 	
 	#id, brand, desc, series, gen, socket, codename, unlocked for CPU
 	#id,brand,title,chipset,vendor,socket for MOBO
