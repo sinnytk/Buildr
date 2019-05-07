@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static from staticfiles %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+<style>
+.js-data-example-single{
+  width: 75%
+}
+</style>
 <script>
     $(document).ready(function() {
+      $(".js-data-example-single").select2();
       $("#cpu-select").change( function() {
       var url = "ajax/get/mobos";
       var cpu = $(this).val();
@@ -39,33 +47,32 @@
     <div class="uk-margin-top uk-margin-left uk-margin-right">
             <label class="uk-form-label" for="form-horizontal-select">Processor</label>
             <div class="uk-form-controls">
-                <select class="uk-select" id="cpu-select">
+                <select class="js-data-example-single" id="cpu-select">
                         <option selected disabled value="0">Select a processor</option>
                         {% for cpu in cpus %}
-                        <option value={{cpu.id}}>{{cpu.title|truncatewords:8}} (Rs {{cpu.min_price}})</option>
+                        <option value={{cpu.id}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
                         {% endfor %}
                 </select>
             </div>
-            <label class="uk-form-label">.....</label>
     </div>
     <div class="uk-margin-top uk-margin-left uk-margin-right">
             <label class="uk-form-label" for="form-horizontal-select">Motherboard</label>
             <div class="uk-form-controls">
-                <select class="uk-select" id="mobo-select" style="visibility: hidden;">
+                <select class="js-data-example-single" id="mobo-select">
                 </select>
             </div>
     </div>
     <div class="uk-margin-top uk-margin-left uk-margin-right">
             <label class="uk-form-label" for="form-horizontal-select">RAM</label>
             <div class="uk-form-controls">
-                <select class="uk-select" id="ram-select"  style="visibility: hidden;">
+                <select class="js-data-example-single" id="ram-select"  style="visibility: hidden;">
                 </select>
             </div>
     </div>
     <div class="uk-margin-top uk-margin-left uk-margin-right">
             <label class="uk-form-label" for="form-horizontal-select">Graphics Card</label>
             <div class="uk-form-controls">
-                <select class="uk-select" id="gpu-select"">
+                <select class="js-data-example-single" id="gpu-select"">
                     <option selected disabled value="0">Select a graphics card</option>
                     {% for gpu in gpus %}
                     <option value={{gpu.id}}>{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
