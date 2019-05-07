@@ -1,0 +1,4 @@
+<option selected disabled value="0">Select a motherboard</option>
+{% for ram in rams %}
+<option value={{ram.id}}>{{ram.title}} (Rs {{ram.min_price}})</option>
+{% endfor %}

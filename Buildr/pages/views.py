@@ -27,11 +27,35 @@ def home_view(request, *args, **kwargs):
 def build_view(request, *args, **kwargs):
     context = {
         "cpus":Product.objects.all().filter(category="CPU").order_by("min_price"),
-        "mobos":Product.objects.all().filter(category="MOBO").order_by("min_price"),
-        "rams":Product.objects.all().filter(category="RAM").order_by("min_price"),
         "gpus":Product.objects.all().filter(category="GPU").order_by("min_price")
+        
     }
     return render(request,"build.html",context)
+def build_view_mobos(request, *args, **kwargs):
+    if request.method == 'GET':
+        cpu = Processor.objects.get(id=request.GET.get('cpu'))
+        compatible_mobos = []
+        mobos = Motherboard.objects.all().filter(socket=cpu.socket)
+        for mobo in mobos:
+            compatible_mobos.append(Product.objects.get(id=mobo.id))
+    context = {
+        'mobos':compatible_mobos
+    }
+    return render(request, "buildform/mobo_list.html",context)
+def build_view_rams(request, *args, **kwargs):
+    if request.method == 'GET':
+        cpu = Processor.objects.get(id=request.GET.get('cpu'))
+        compatible_rams = []
+        if((cpu.gen>5 and cpu.brand=="INTEL") or (cpu.socket=="AM4")):
+            rams = Ram.objects.all().filter(rate="DDR4")
+        else:
+            rams = Ram.objects.all().filter(rate="DDR3")
+        for ram in rams:
+            compatible_rams.append(Product.objects.get(id=ram.id))
+    context = {
+        'rams':compatible_rams
+    }
+    return render(request, "buildform/ram_list.html",context)
 
 def products_gpu_view(request,*args,**kwargs):
     products=Product.objects.all().filter(category="GPU")

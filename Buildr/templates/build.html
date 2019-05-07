@@ -1,48 +1,74 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load static from staticfiles %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+      $("#cpu-select").change( function() {
+      var url = "ajax/get/mobos";
+      var cpu = $(this).val();
+      $.ajax({
+        url: url,
+        data: {
+          'cpu': cpu
+        },
+        success: function (data) {
+            $('#mobo-select').css({'visibility':'visible',});
+            $("#mobo-select").html(data);
+        }
+      });
+    });
+    $("#cpu-select").change( function() {
+      var url = "ajax/get/rams";
+      var cpu = $(this).val();
+      $.ajax({
+        url: url,
+        data: {
+          'cpu': cpu
+        },
+        success: function (data) {
+            $('#ram-select').css({'visibility':'visible',});
+            $("#ram-select").html(data);
+        }
+      });
+    });
+});
+</script>
 <div class="uk-align-center">
 <form class="uk-form-horizontal uk-margin-large uk-section-muted">
     <div class="uk-margin-top uk-margin-left uk-margin-right">
-        <label class="uk-form-label" for="form-horizontal-select">Processor</label>
-        <div class="uk-form-controls">
-            <select class="uk-select">
-                <option selected disabled value="0">Select a processor</option>
-                {% for cpu in cpus %}
-                <option>{{cpu.title}} (Rs {{cpu.min_price}})</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-    <div class="uk-margin-top uk-margin-left uk-margin-right">
-            <label class="uk-form-label" for="form-horizontal-select">Motherboard</label>
+            <label class="uk-form-label" for="form-horizontal-select">Processor</label>
             <div class="uk-form-controls">
-                <select class="uk-select">
-                    <option selected disabled value="0">Select a motherboard</option>
-                    {% for mobo in mobos %}
-                    <option>{{mobo.title}} (Rs {{mobo.min_price}})</option>
-                    {% endfor %}
+                <select class="uk-select" id="cpu-select">
+                        <option selected disabled value="0">Select a processor</option>
+                        {% for cpu in cpus %}
+                        <option value={{cpu.id}}>{{cpu.title|truncatewords:8}} (Rs {{cpu.min_price}})</option>
+                        {% endfor %}
                 </select>
             </div>
     </div>
     <div class="uk-margin-top uk-margin-left uk-margin-right">
-            <label class="uk-form-label" for="form-horizontal-select">Graphics Card</label>
+            <label class="uk-form-label" for="form-horizontal-select">Motherboard</label>
             <div class="uk-form-controls">
-                <select class="uk-select">
-                        <option selected disabled value="0">Select a graphics card</option>
-                        {% for gpu in gpus %}
-                        <option>{{gpu.title}} (Rs {{gpu.min_price}})</option>
-                        {% endfor %}
+                <select class="uk-select" id="mobo-select" style="visibility: hidden;">
                 </select>
             </div>
     </div>
     <div class="uk-margin-top uk-margin-left uk-margin-right">
             <label class="uk-form-label" for="form-horizontal-select">RAM</label>
             <div class="uk-form-controls">
-                <select class="uk-select">
-                        <option selected disabled value="0">Select a ram</option>
-                        {% for ram in rams %}
-                        <option>{{ram.title}} (Rs {{ram.min_price}})</option>
-                        {% endfor %}
+                <select class="uk-select" id="ram-select"  style="visibility: hidden;">
+                </select>
+            </div>
+    </div>
+    <div class="uk-margin-top uk-margin-left uk-margin-right">
+            <label class="uk-form-label" for="form-horizontal-select">Graphics Card</label>
+            <div class="uk-form-controls">
+                <select class="uk-select" id="gpu-select"">
+                    <option selected disabled value="0">Select a graphics card</option>
+                    {% for gpu in gpus %}
+                    <option value={{gpu.id}}>{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
+                    {% endfor %}
                 </select>
             </div>
     </div>
