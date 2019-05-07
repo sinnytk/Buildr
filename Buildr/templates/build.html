@@ -6,7 +6,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
 <style>
 .js-data-example-single{
-  width: 75%
+  width: 70%
 }
 </style>
 <script>
@@ -42,35 +42,34 @@
     });
 });
 </script>
-<div class="uk-align-center">
-<form class="uk-form-horizontal uk-margin-large uk-section-muted">
-    <div class="uk-margin-top uk-margin-left uk-margin-right">
-            <label class="uk-form-label" for="form-horizontal-select">Processor</label>
+<form class="uk-form-stacked uk-text-center uk-position-center" style="width:75%">
+    <div class="uk-margin">
+        <label class="uk-form-label" for="cpu-select"><h2>Processor</h2></h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="cpu-select">
-                        <option selected disabled value="0">Select a processor</option>
-                        {% for cpu in cpus %}
-                        <option value={{cpu.id}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
-                        {% endfor %}
+                  <option selected disabled value="0">Select a processor</option>
+                  {% for cpu in cpus %}
+                  <option value={{cpu.id}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
+                  {% endfor %}
                 </select>
             </div>
     </div>
-    <div class="uk-margin-top uk-margin-left uk-margin-right">
-            <label class="uk-form-label" for="form-horizontal-select">Motherboard</label>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="mobo-select"><h2>Motherboard</h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="mobo-select">
                 </select>
             </div>
     </div>
-    <div class="uk-margin-top uk-margin-left uk-margin-right">
-            <label class="uk-form-label" for="form-horizontal-select">RAM</label>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="ram-select"><h2>Ram</h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="ram-select"  style="visibility: hidden;">
                 </select>
             </div>
     </div>
-    <div class="uk-margin-top uk-margin-left uk-margin-right">
-            <label class="uk-form-label" for="form-horizontal-select">Graphics Card</label>
+    <div class="uk-margin">
+      <label class="uk-form-label" for="gpu-select"><h2>Graphics Card</h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="gpu-select"">
                     <option selected disabled value="0">Select a graphics card</option>
@@ -80,7 +79,5 @@
                 </select>
             </div>
     </div>
-   
 </form>
-</div>
 {% endblock %}
