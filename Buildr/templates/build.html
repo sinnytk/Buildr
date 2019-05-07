@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="uk-align-center">
+<form class="uk-form-horizontal uk-margin-large uk-section-muted">
+    <div class="uk-margin-top uk-margin-left uk-margin-right">
+        <label class="uk-form-label" for="form-horizontal-select">Processor</label>
+        <div class="uk-form-controls">
+            <select class="uk-select">
+                <option selected disabled value="0">Select a processor</option>
+                {% for cpu in cpus %}
+                <option>{{cpu.title}} (Rs {{cpu.min_price}})</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="uk-margin-top uk-margin-left uk-margin-right">
+            <label class="uk-form-label" for="form-horizontal-select">Motherboard</label>
+            <div class="uk-form-controls">
+                <select class="uk-select">
+                    <option selected disabled value="0">Select a motherboard</option>
+                    {% for mobo in mobos %}
+                    <option>{{mobo.title}} (Rs {{mobo.min_price}})</option>
+                    {% endfor %}
+                </select>
+            </div>
+    </div>
+    <div class="uk-margin-top uk-margin-left uk-margin-right">
+            <label class="uk-form-label" for="form-horizontal-select">Graphics Card</label>
+            <div class="uk-form-controls">
+                <select class="uk-select">
+                        <option selected disabled value="0">Select a graphics card</option>
+                        {% for gpu in gpus %}
+                        <option>{{gpu.title}} (Rs {{gpu.min_price}})</option>
+                        {% endfor %}
+                </select>
+            </div>
+    </div>
+    <div class="uk-margin-top uk-margin-left uk-margin-right">
+            <label class="uk-form-label" for="form-horizontal-select">RAM</label>
+            <div class="uk-form-controls">
+                <select class="uk-select">
+                        <option selected disabled value="0">Select a ram</option>
+                        {% for ram in rams %}
+                        <option>{{ram.title}} (Rs {{ram.min_price}})</option>
+                        {% endfor %}
+                </select>
+            </div>
+    </div>
+   
+</form>
+</div>
+{% endblock %}

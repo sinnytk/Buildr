@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from product.models import Product
+from product.models import Product,Processor,Motherboard,Ram,Gpu
 def home_view(request, *args, **kwargs):
     products=Product.objects.all()
     sortvalue=0
@@ -23,6 +23,15 @@ def home_view(request, *args, **kwargs):
         'all_products': products
     }
     return render(request,"home.html",context)
+
+def build_view(request, *args, **kwargs):
+    context = {
+        "cpus":Product.objects.all().filter(category="CPU").order_by("min_price"),
+        "mobos":Product.objects.all().filter(category="MOBO").order_by("min_price"),
+        "rams":Product.objects.all().filter(category="RAM").order_by("min_price"),
+        "gpus":Product.objects.all().filter(category="GPU").order_by("min_price")
+    }
+    return render(request,"build.html",context)
 
 def products_gpu_view(request,*args,**kwargs):
     products=Product.objects.all().filter(category="GPU")

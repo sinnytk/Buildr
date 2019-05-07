@@ -16,17 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from pages.views import home_view
-from pages.views import products_ram_view
-from pages.views import products_cpu_view
-from pages.views import products_mobo_view
-from pages.views import products_gpu_view
+from pages.views import home_view, products_ram_view, products_cpu_view, products_mobo_view, products_gpu_view, build_view
 from product.views import product_detail_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',home_view,name='home'),
     re_path(r'^product/(ram|gpu|cpu|mobo)/(?P<id>\w+)/$', product_detail_view),
     path('products/ram',products_ram_view),
+    path('build/',build_view),
     path('products/gpu',products_gpu_view),
     path('products/cpu',products_cpu_view),
     path('products/mobo',products_mobo_view),
