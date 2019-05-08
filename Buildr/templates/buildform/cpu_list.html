@@ -1,4 +1,4 @@
 <option selected disabled value="0">Select a processor</option>
 {% for cpu in cpus %}
-<option value={{cpu.id}}>{{cpu.title}} (Rs {{cpu.min_price}})</option>
+<option value={{cpu.id}} price={{cpu.min_price}}>{{cpu.title}} (Rs {{cpu.min_price}})</option>
 {% endfor %}

@@ -1,4 +1,4 @@
 <option selected disabled value="0">Select a ram</option>
 {% for ram in rams %}
-<option value={{ram.id}} price="{{ram.min_price}}">{{ram.title}} (Rs {{ram.min_price}})</option>
+<option value={{ram.id}} price={{ram.min_price}}>{{ram.title}} (Rs {{ram.min_price}})</option>
 {% endfor %}

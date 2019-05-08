@@ -1,4 +1,4 @@
 <option selected disabled value="0">Select a motherboard</option>
 {% for mobo in mobos %}
-<option value={{mobo.id}}>{{mobo.title}} (Rs {{mobo.min_price}})</option>
+<option value={{mobo.id}} price={{mobo.min_price}}>{{mobo.title}} (Rs {{mobo.min_price}})</option>
 {% endfor %}

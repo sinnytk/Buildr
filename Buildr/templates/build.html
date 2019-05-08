@@ -67,7 +67,7 @@
                 <select class="js-data-example-single" id="cpu-select">
                   <option selected disabled value="0">Select a processor</option>
                   {% for cpu in cpus %}
-                  <option value={{cpu.id}} price="{{cpu.min_price}}">{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
+                  <option value={{cpu.id}} price={{cpu.min_price}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
                   {% endfor %}
                 </select>
             </div>
@@ -78,7 +78,7 @@
                 <select class="js-data-example-single" id="mobo-select">
                   <option selected disabled value="0">Select a motherboard</option>
                   {% for mobo in mobos %}
-                  <option value={{mobo.id} price="{{mobo.min_price}}"}>{{mobo.title|truncatewords:10}} (Rs {{mobo.min_price}})</option>
+                  <option value={{mobo.id} price={{mobo.min_price}}}>{{mobo.title|truncatewords:10}} (Rs {{mobo.min_price}})</option>
                   {% endfor %}
                 </select>
             </div>
@@ -96,7 +96,7 @@
                 <select class="js-data-example-single" id="gpu-select"">
                     <option selected disabled value="0">Select a graphics card</option>
                     {% for gpu in gpus %}
-                    <option value={{gpu.id}} price="{{ram.min_price}}">{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
+                    <option value={{gpu.id}} price={{ram.min_price}}>{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
                     {% endfor %}
                 </select>
             </div>
