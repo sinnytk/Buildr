@@ -13,33 +13,51 @@
     $(document).ready(function() {
       $(".js-data-example-single").select2();
       $("#cpu-select").change( function() {
-      var url = "ajax/get/mobos";
       var cpu = $(this).val();
+      var mobo = $('#mobo-select').val();
+      $.getJSON('ajax/compatible', {'cpu':cpu,'mobo':mobo},function(data) {
+            if(data.notCompatible)
+            {
+              $.ajax({
+                url: "ajax/get/mobos",
+                data: {
+                  'cpu': cpu
+                },
+                success: function (data) {
+                    $("#mobo-select").html(data);
+                }
+              });
+            }
+        });
       $.ajax({
-        url: url,
-        data: {
-          'cpu': cpu
-        },
-        success: function (data) {
-            $('#mobo-select').css({'visibility':'visible',});
-            $("#mobo-select").html(data);
-        }
+              url: "ajax/get/rams",
+              data: {
+                'cpu': cpu
+              },
+              success: function (data) {
+                  $("#ram-select").html(data);
+              }
+            });
       });
-    });
-    $("#cpu-select").change( function() {
-      var url = "ajax/get/rams";
-      var cpu = $(this).val();
-      $.ajax({
-        url: url,
-        data: {
-          'cpu': cpu
-        },
-        success: function (data) {
-            $('#ram-select').css({'visibility':'visible',});
-            $("#ram-select").html(data);
-        }
+    $("#mobo-select").change( function() {
+      var mobo = $(this).val();
+      var cpu = $('#cpu-select').val();
+      var notCompatible;
+      $.getJSON('ajax/compatible', {'cpu':cpu,'mobo':mobo},function(data) {
+                if(data.notCompatible)
+                {
+                    $.ajax({
+                    url: "ajax/get/cpus",
+                    data: {
+                    'mobo': mobo
+                    },
+                    success: function (data) {
+                      $("#cpu-select").html(data);
+                    }
+                    });
+                }
+            });
       });
-    });
 });
 </script>
 <form class="uk-form-stacked uk-text-center uk-position-center" style="width:75%">
@@ -49,7 +67,7 @@
                 <select class="js-data-example-single" id="cpu-select">
                   <option selected disabled value="0">Select a processor</option>
                   {% for cpu in cpus %}
-                  <option value={{cpu.id}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
+                  <option value={{cpu.id}} price="{{cpu.min_price}}">{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
                   {% endfor %}
                 </select>
             </div>
@@ -58,13 +76,17 @@
         <label class="uk-form-label" for="mobo-select"><h2>Motherboard</h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="mobo-select">
+                  <option selected disabled value="0">Select a motherboard</option>
+                  {% for mobo in mobos %}
+                  <option value={{mobo.id} price="{{mobo.min_price}}"}>{{mobo.title|truncatewords:10}} (Rs {{mobo.min_price}})</option>
+                  {% endfor %}
                 </select>
             </div>
     </div>
     <div class="uk-margin">
         <label class="uk-form-label" for="ram-select"><h2>Ram</h2></label>
             <div class="uk-form-controls">
-                <select class="js-data-example-single" id="ram-select"  style="visibility: hidden;">
+                <select class="js-data-example-single" id="ram-select">
                 </select>
             </div>
     </div>
@@ -74,7 +96,7 @@
                 <select class="js-data-example-single" id="gpu-select"">
                     <option selected disabled value="0">Select a graphics card</option>
                     {% for gpu in gpus %}
-                    <option value={{gpu.id}}>{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
+                    <option value={{gpu.id}} price="{{ram.min_price}}">{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
                     {% endfor %}
                 </select>
             </div>
