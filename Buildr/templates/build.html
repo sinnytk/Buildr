@@ -29,20 +29,19 @@
               });
             }
         });
-      $.ajax({
-              url: "ajax/get/rams",
-              data: {
-                'cpu': cpu
-              },
-              success: function (data) {
-                  $("#ram-select").html(data);
-              }
-            });
+              $.ajax({
+                url: "ajax/get/rams",
+                data: {
+                  'cpu': cpu
+                },
+                success: function (data) {
+                    $("#ram-select").html(data);
+                }
+              });
       });
     $("#mobo-select").change( function() {
       var mobo = $(this).val();
       var cpu = $('#cpu-select').val();
-      var notCompatible;
       $.getJSON('ajax/compatible', {'cpu':cpu,'mobo':mobo},function(data) {
                 if(data.notCompatible)
                 {
@@ -58,6 +57,15 @@
                 }
             });
       });
+    $("form").on("change",'.js-data-example-single',
+      function() {
+        var totalprice = 0;
+        $(".js-data-example-single").each( function () {
+          totalprice+=$(this).select2().find(":selected").data("price")}
+        );
+        $("#total-price").html(totalprice);
+      }
+    );
 });
 </script>
 <form class="uk-form-stacked uk-text-center uk-position-center" style="width:75%">
@@ -65,9 +73,9 @@
         <label class="uk-form-label" for="cpu-select"><h2>Processor</h2></h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="cpu-select">
-                  <option selected disabled value="0">Select a processor</option>
+                  <option selected disabled value="0" data-price=0>Select a processor</option>
                   {% for cpu in cpus %}
-                  <option value={{cpu.id}} price={{cpu.min_price}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
+                  <option value={{cpu.id}} data-price={{cpu.min_price}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
                   {% endfor %}
                 </select>
             </div>
@@ -76,9 +84,9 @@
         <label class="uk-form-label" for="mobo-select"><h2>Motherboard</h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="mobo-select">
-                  <option selected disabled value="0">Select a motherboard</option>
+                  <option selected disabled value="0" data-price=0>Select a motherboard</option>
                   {% for mobo in mobos %}
-                  <option value={{mobo.id}} price={{mobo.min_price}}>{{mobo.title|truncatewords:10}} (Rs {{mobo.min_price}})</option>
+                  <option value={{mobo.id}} data-price={{mobo.min_price}}>{{mobo.title|truncatewords:10}} (Rs {{mobo.min_price}})</option>
                   {% endfor %}
                 </select>
             </div>
@@ -87,6 +95,7 @@
         <label class="uk-form-label" for="ram-select"><h2>Ram</h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="ram-select">
+                <option selected disabled value="0" data-price=0>Select a ram</option>
                 </select>
             </div>
     </div>
@@ -94,12 +103,15 @@
       <label class="uk-form-label" for="gpu-select"><h2>Graphics Card</h2></label>
             <div class="uk-form-controls">
                 <select class="js-data-example-single" id="gpu-select"">
-                    <option selected disabled value="0">Select a graphics card</option>
+                    <option selected disabled value="0" data-price=0>Select a graphics card</option>
                     {% for gpu in gpus %}
-                    <option value={{gpu.id}} price={{ram.min_price}}>{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
+                    <option value={{gpu.id}} data-price={{gpu.min_price}}>{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
                     {% endfor %}
                 </select>
             </div>
+    </div>
+    <div class="uk-margin">
+        <label class="uk-form-label"><h2>Total: </h2><span id="total-price"></span></label>
     </div>
 </form>
 {% endblock %}
