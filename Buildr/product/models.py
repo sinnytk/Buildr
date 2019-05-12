@@ -5,8 +5,6 @@ class Gpu(models.Model):
     model = models.CharField(max_length=10, blank=True, null=True)
     brand = models.CharField(max_length=6, blank=True, null=True)
     vendor = models.CharField(max_length=30, blank=True, null=True)
-    image = models.CharField(max_length=200, blank=True, null=True)
-    min_price = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -31,8 +29,6 @@ class Motherboard(models.Model):
     chipset = models.CharField(max_length=20)
     vendor = models.CharField(max_length=20)
     socket = models.CharField(max_length=20)
-    image = models.CharField(max_length=200, blank=True, null=True)
-    min_price = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -59,8 +55,6 @@ class Processor(models.Model):
     socket = models.CharField(max_length=20)
     codename = models.CharField(max_length=20)
     unlocked = models.CharField(max_length=3)
-    image = models.CharField(max_length=200, blank=True, null=True)
-    min_price = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -97,8 +91,6 @@ class Ram(models.Model):
     size = models.CharField(max_length=5, blank=True, null=True)
     rate = models.CharField(max_length=4, blank=True, null=True)
     speed = models.CharField(max_length=7, blank=True, null=True)
-    image = models.CharField(max_length=200, blank=True, null=True)
-    min_price = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
