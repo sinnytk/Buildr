@@ -9,4 +9,5 @@ Buildr/Buildr/config.py
 Buildr/models.py
 Scripts/
 tcl/
+*.vsdx
 
