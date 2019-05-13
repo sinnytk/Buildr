@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS `buildrtest` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */;
+CREATE DATABASE  IF NOT EXISTS `buildrtest` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci */;
 USE `buildrtest`;
 -- MySQL dump 10.13  Distrib 8.0.15, for Win64 (x86_64)
 --
@@ -23,7 +23,7 @@ USE `buildrtest`;
 
 DROP TABLE IF EXISTS `gpu`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `gpu` (
   `id` varchar(40) NOT NULL,
   `model` varchar(10) DEFAULT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE `gpu` (
 
 DROP TABLE IF EXISTS `motherboard`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `motherboard` (
   `id` varchar(30) NOT NULL,
   `brand` enum('AMD','INTEL') DEFAULT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE `motherboard` (
 
 DROP TABLE IF EXISTS `processor`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `processor` (
   `id` varchar(7) NOT NULL,
   `brand` enum('AMD','INTEL') DEFAULT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE `processor` (
 
 DROP TABLE IF EXISTS `product`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `product` (
   `id` varchar(50) NOT NULL,
   `title` varchar(300) DEFAULT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE `product` (
 
 DROP TABLE IF EXISTS `product_prices`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `product_prices` (
   `id` varchar(50) NOT NULL,
   `price` int(6) DEFAULT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE `product_prices` (
 
 DROP TABLE IF EXISTS `ram`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `ram` (
   `id` varchar(40) NOT NULL,
   `brand` varchar(30) DEFAULT NULL,
