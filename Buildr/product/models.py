@@ -11,18 +11,6 @@ class Gpu(models.Model):
         db_table = 'gpu'
 
 
-class GpuPrices(models.Model):
-    id = models.ForeignKey(Gpu, models.DO_NOTHING, db_column='id', primary_key=True)
-    price = models.IntegerField(blank=True, null=True)
-    link = models.CharField(max_length=200)
-    seller = models.CharField(max_length=20)
-
-    class Meta:
-        managed = False
-        db_table = 'gpu_prices'
-        unique_together = (('id', 'seller'),)
-
-
 class Motherboard(models.Model):
     id = models.CharField(primary_key=True, max_length=30)
     brand = models.CharField(max_length=5, blank=True, null=True)
@@ -33,18 +21,6 @@ class Motherboard(models.Model):
     class Meta:
         managed = False
         db_table = 'motherboard'
-
-
-class MotherboardPrices(models.Model):
-    id = models.ForeignKey(Motherboard, models.DO_NOTHING, db_column='id', primary_key=True)
-    price = models.IntegerField(blank=True, null=True)
-    link = models.CharField(max_length=200)
-    seller = models.CharField(max_length=20)
-
-    class Meta:
-        managed = False
-        db_table = 'motherboard_prices'
-        unique_together = (('id', 'seller'),)
 
 
 class Processor(models.Model):
@@ -61,18 +37,6 @@ class Processor(models.Model):
         db_table = 'processor'
 
 
-class ProcessorPrices(models.Model):
-    id = models.ForeignKey(Processor, models.DO_NOTHING, db_column='id', primary_key=True)
-    price = models.IntegerField(blank=True, null=True)
-    link = models.CharField(max_length=200)
-    seller = models.CharField(max_length=20)
-
-    class Meta:
-        managed = False
-        db_table = 'processor_prices'
-        unique_together = (('id', 'seller'),)
-
-
 class Product(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
     title = models.CharField(max_length=300, blank=True, null=True)
@@ -85,6 +49,18 @@ class Product(models.Model):
         db_table = 'product'
 
 
+class ProductPrices(models.Model):
+    id = models.CharField(primary_key=True, max_length=50)
+    price = models.IntegerField(blank=True, null=True)
+    link = models.CharField(max_length=200)
+    seller = models.CharField(max_length=20, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'product_prices'
+        unique_together = (('id', 'link'),)
+
+
 class Ram(models.Model):
     id = models.CharField(primary_key=True, max_length=40)
     brand = models.CharField(max_length=30, blank=True, null=True)
@@ -95,15 +71,3 @@ class Ram(models.Model):
     class Meta:
         managed = False
         db_table = 'ram'
-
-
-class RamPrices(models.Model):
-    id = models.ForeignKey(Ram, models.DO_NOTHING, db_column='id', primary_key=True)
-    price = models.IntegerField(blank=True, null=True)
-    link = models.CharField(max_length=200)
-    seller = models.CharField(max_length=20, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'ram_prices'
-        unique_together = (('id', 'link'),)

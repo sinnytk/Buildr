@@ -1,17 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Product, RamPrices, ProcessorPrices, MotherboardPrices, GpuPrices, Processor, Motherboard
+from .models import Product, ProductPrices, Processor, Motherboard
 
 def product_detail_view(request, *args, **kwargs):
     obj = Product.objects.get(id=kwargs['id'])
-    if(obj.category=="RAM"):
-        prices=RamPrices.objects.all().filter(id=obj.id)
-    elif(obj.category=="CPU"):
-        prices=ProcessorPrices.objects.all().filter(id=obj.id)
-    elif(obj.category=="MOBO"):
-        prices=MotherboardPrices.objects.all().filter(id=obj.id)
-    elif(obj.category=="GPU"):
-        prices=GpuPrices.objects.all().filter(id=obj.id)
+    prices=ProductPrices.objects.all().filter(id=obj.id)
     context = {
         'object':obj,
         'prices':prices
