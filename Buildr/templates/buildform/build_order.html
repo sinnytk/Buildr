@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static from staticfiles %}
+<div class="uk-margin uk-text-center uk-position-center"><table class="uk-table uk-table-striped">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Prices/Links</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Processor</td>
+            <td><img src="{{cpu.image}}" width="20%"></img></td>
+            <td>{{cpu.title}}</td>
+            <td>
+            {% for price in cpu_prices%}
+            <a class="uk-link-muted"><p>Buy for {{price.price}} from {{price.seller}}</p></a>
+            {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Motherboard</td>
+            <td><img src="{{mobo.image}}" width="20%"></img></td>
+            <td>{{mobo.title}}</td>
+            <td>
+            {% for price in mobo_prices%}
+            <a class="uk-link-muted"><p>Buy for {{price.price}} from {{price.seller}}</p></a>
+            {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Graphics Card</td>
+            <td><img src="{{gpu.image}}" width="20%"></img></td>
+            <td>{{gpu.title}}</td>
+            <td>
+            {% for price in gpu_prices%}
+            <a class="uk-link-muted"><p>Buy for {{price.price}} from {{price.seller}}</p></a>
+            {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Ram</td>
+            <td><img src="{{ram.image}}" width="20%"></img></td>
+            <td>{{ram.title}}</td>
+            <td>
+            {% for price in ram_prices%}
+            <a class="uk-link-muted"><p>Buy for {{price.price}} from {{price.seller}}</p></a>
+            {% endfor %}
+            </td>
+        </tr>
+    </tbody>
+</table></div>
+{% endblock %}

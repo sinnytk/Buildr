@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from pages.views import home_view, products_ram_view, products_cpu_view, products_mobo_view, products_gpu_view, build_view,build_view_mobos,build_view_rams,build_view_cpus
+from pages.views import home_view, products_ram_view, products_cpu_view, products_mobo_view, products_gpu_view, build_view,build_view_mobos,build_view_rams,build_view_cpus,build_view_order
 from product.views import product_detail_view, compatible
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,7 +30,7 @@ urlpatterns = [
     path('build/ajax/compatible', compatible),
     path('build/ajax/get/mobos',build_view_mobos),
     path('build/ajax/get/cpus',build_view_cpus),
-    path('build/ajax/get/rams',build_view_rams)
-
+    path('build/ajax/get/rams',build_view_rams),
+    path('build/order/',build_view_order)
 ]
 urlpatterns+=staticfiles_urlpatterns()

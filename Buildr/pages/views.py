@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from product.models import Product,Processor,Motherboard,Ram,Gpu
+from product.models import Product,Processor,Motherboard,Ram,Gpu,ProductPrices
 def home_view(request, *args, **kwargs):
     products=Product.objects.all()
     sortvalue=0
@@ -136,6 +136,34 @@ def products_cpu_view(request,*args,**kwargs):
     }
     return render(request,"home.html",context)
 
+def build_view_order(request):
+    context = {}
+    cpu_id = request.POST.get('cpu',0)
+    ram_id = request.POST.get('ram',0)
+    gpu_id = request.POST.get('gpu',0)
+    mobo_id = request.POST.get('mobo',0)
+    if(cpu_id != 0):
+        cpu = Product.objects.get(id=cpu_id)
+        cpu_prices = ProductPrices.objects.all().filter(id=cpu_id)
+        context['cpu'] = cpu
+        context['cpu_prices'] = cpu_prices
+    if(ram_id != 0):
+        ram = Product.objects.get(id=ram_id)
+        ram_prices = ProductPrices.objects.all().filter(id=ram_id)
+        context['ram'] = ram
+        context['ram_prices'] = ram_prices
+    if(gpu_id != 0):
+        gpu = Product.objects.get(id=gpu_id)
+        gpu_prices = ProductPrices.objects.all().filter(id=gpu_id)
+        context['gpu'] = gpu
+        context['gpu_prices'] = gpu_prices
+    if(mobo_id != 0):
+        mobo = Product.objects.get(id=mobo_id)
+        mobo_prices = ProductPrices.objects.all().filter(id=mobo_id)
+        context['mobo'] = mobo
+        context['mobo_prices'] = mobo_prices
+    return render(request, "buildform/build_order.html",context)
+    
 def products_mobo_view(request,*args,**kwargs):
     products=Product.objects.all().filter(category="MOBO")
     sortvalue=0

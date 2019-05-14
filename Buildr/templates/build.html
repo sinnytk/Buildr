@@ -68,11 +68,12 @@
     );
 });
 </script>
-<form class="uk-form-stacked uk-text-center uk-position-center" style="width:75%">
+<form class="uk-form-stacked uk-text-center uk-position-center" style="width:75%" action="/build/order/" method="post">
+  {% csrf_token %}
     <div class="uk-margin">
         <label class="uk-form-label" for="cpu-select"><h2>Processor</h2></h2></label>
             <div class="uk-form-controls">
-                <select class="js-data-example-single" id="cpu-select">
+                <select class="js-data-example-single" id="cpu-select" name="cpu">
                   <option selected disabled value="0" data-price=0>Select a processor</option>
                   {% for cpu in cpus %}
                   <option value={{cpu.id}} data-price={{cpu.min_price}}>{{cpu.title|truncatewords:10}} (Rs {{cpu.min_price}})</option>
@@ -83,7 +84,7 @@
     <div class="uk-margin">
         <label class="uk-form-label" for="mobo-select"><h2>Motherboard</h2></label>
             <div class="uk-form-controls">
-                <select class="js-data-example-single" id="mobo-select">
+                <select class="js-data-example-single" id="mobo-select" name="mobo">
                   <option selected disabled value="0" data-price=0>Select a motherboard</option>
                   {% for mobo in mobos %}
                   <option value={{mobo.id}} data-price={{mobo.min_price}}>{{mobo.title|truncatewords:10}} (Rs {{mobo.min_price}})</option>
@@ -94,7 +95,7 @@
     <div class="uk-margin">
         <label class="uk-form-label" for="ram-select"><h2>Ram</h2></label>
             <div class="uk-form-controls">
-                <select class="js-data-example-single" id="ram-select">
+                <select class="js-data-example-single" id="ram-select" name="ram">
                 <option selected disabled value="0" data-price=0>Select a ram</option>
                 </select>
             </div>
@@ -102,7 +103,7 @@
     <div class="uk-margin">
       <label class="uk-form-label" for="gpu-select"><h2>Graphics Card</h2></label>
             <div class="uk-form-controls">
-                <select class="js-data-example-single" id="gpu-select"">
+                <select class="js-data-example-single" id="gpu-select" name="gpu">
                     <option selected disabled value="0" data-price=0>Select a graphics card</option>
                     {% for gpu in gpus %}
                     <option value={{gpu.id}} data-price={{gpu.min_price}}>{{gpu.title|truncatewords:8}} (Rs {{gpu.min_price}})</option>
@@ -111,7 +112,10 @@
             </div>
     </div>
     <div class="uk-margin">
-        <label class="uk-form-label"><h2>Total: </h2><span id="total-price"></span></label>
+        <label class="uk-form-label"><h2>Total: </h2><h2 id="total-price"></span></label>
+    </div>
+    <div class="uk-magin">
+      <button class="uk-button uk-button-primary">BUILD</button>
     </div>
 </form>
 {% endblock %}
