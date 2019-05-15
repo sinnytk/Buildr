@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static from staticfiles %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var cpu = "{{cpu.min_price}}";
+        var ram = "{{ram.min_price}}";
+        var mobo = "{{mobo.min_price}}";
+        var gpu = "{{gpu.min_price}}";
+        $("#total-price").html(cpu*1+ram*1+mobo*1+gpu*1);
+      });
+</script>
 <div class="uk-margin uk-position-center">
     <table class="uk-table uk-table-striped uk-table-hover">
         <thead>
@@ -51,6 +61,12 @@
                 <a class="uk-link-muted"><p>Buy for {{price.price}} from {{price.seller}}</p></a>
                 {% endfor %}
                 </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td id="total-price">test</td>
             </tr>
         </tbody>
     </table>
