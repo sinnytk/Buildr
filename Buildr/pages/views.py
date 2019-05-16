@@ -4,22 +4,22 @@ from product.models import Product,Processor,Motherboard,Ram,Gpu,ProductPrices
 from django.db.models import Max,Min
 def home_view(request, *args, **kwargs):
     products=Product.objects.all()
-    maxprice=Product.objects.aggregate(Max('min_price'))['min_price__max']
-    minprice=Product.objects.aggregate(Min('min_price'))['min_price__min']
+    maxprice=products.aggregate(Max('min_price'))['min_price__max']
+    minprice=products.aggregate(Min('min_price'))['min_price__min']
     if "budget" in request.GET:
         case=int(request.GET.get('sort'))
         if(case == 1):
             sortvalue=1
-            products = Product.objects.all().order_by("min_price")
+            products = products.order_by("min_price")
         elif(case == 2):
             sortvalue=2
-            products = Product.objects.all().order_by("-min_price")
+            products = products.order_by("-min_price")
         elif(case == 3):
             sortvalue=3
-            products = Product.objects.all().order_by("title")
+            products = products.order_by("title")
         elif(case == 4):
             sortvalue=4
-            products = Product.objects.all().order_by("-title")
+            products = products.order_by("-title")
         if(int(request.GET.get('budget'))>0):
             products=products.filter(min_price__lte=int(request.GET.get('budget')))
         context = {
@@ -80,69 +80,93 @@ def build_view_cpus(request, *args, **kwargs):
     return render(request, "buildform/cpu_list.html",context)
 
 def products_gpu_view(request,*args,**kwargs):
-    products=Product.objects.all().filter(category="GPU")
-    sortvalue=0
-    if request.method == 'POST':
-        case=int(request.POST.get('sort'))
+    products=Product.objects.filter(category="GPU")
+    maxprice=products.aggregate(Max('min_price'))['min_price__max']
+    minprice=products.aggregate(Min('min_price'))['min_price__min']
+    if "budget" in request.GET:
+        case=int(request.GET.get('sort'))
         if(case == 1):
             sortvalue=1
-            products = Product.objects.all().filter(category="GPU").order_by("min_price")
+            products = products.order_by("min_price")
         elif(case == 2):
             sortvalue=2
-            products = Product.objects.all().filter(category="GPU").order_by("-min_price")
+            products = products.order_by("-min_price")
         elif(case == 3):
             sortvalue=3
-            products = Product.objects.all().filter(category="GPU").order_by("title")
+            products = products.order_by("title")
         elif(case == 4):
             sortvalue=4
-            products = Product.objects.all().filter(category="GPU").order_by("-title")
+            products = products.order_by("-title")
+        if(int(request.GET.get('budget'))>0):
+            products=products.filter(min_price__lte=int(request.GET.get('budget')))
+        context = {
+            'all_products':products
+        }
+        return render(request,"home_blocks/products_block.html",context)
     context = {
-        'sortvalue':sortvalue,
-        'all_products': products
+        'all_products': products,
+        'minprice':minprice,
+        'maxprice':maxprice
     }
     return render(request,"home.html",context)
 def products_ram_view(request,*args,**kwargs):
-    products=Product.objects.all().filter(category="RAM")
-    sortvalue=0
-    if request.method == 'POST':
-        case=int(request.POST.get('sort'))
+    products=Product.objects.filter(category="RAM")
+    maxprice=products.aggregate(Max('min_price'))['min_price__max']
+    minprice=products.aggregate(Min('min_price'))['min_price__min']
+    if "budget" in request.GET:
+        case=int(request.GET.get('sort'))
         if(case == 1):
             sortvalue=1
-            products = Product.objects.all().filter(category="RAM").order_by("min_price")
+            products = products.order_by("min_price")
         elif(case == 2):
             sortvalue=2
-            products = Product.objects.all().filter(category="RAM").order_by("-min_price")
+            products = products.order_by("-min_price")
         elif(case == 3):
             sortvalue=3
-            products = Product.objects.all().filter(category="RAM").order_by("title")
+            products = products.order_by("title")
         elif(case == 4):
             sortvalue=4
-            products = Product.objects.all().filter(category="RAM").order_by("-title")
+            products = products.order_by("-title")
+        if(int(request.GET.get('budget'))>0):
+            products=products.filter(min_price__lte=int(request.GET.get('budget')))
+        context = {
+            'all_products':products
+        }
+        return render(request,"home_blocks/products_block.html",context)
     context = {
-        'sortvalue':sortvalue,
-        'all_products': products
+        'all_products': products,
+        'minprice':minprice,
+        'maxprice':maxprice
     }
     return render(request,"home.html",context)
 def products_cpu_view(request,*args,**kwargs):
-    products=Product.objects.all().filter(category="CPU")
-    sortvalue=0
-    if request.method == 'POST':
-        case=int(request.POST.get('sort'))
+    products=Product.objects.filter(category="CPU")
+    maxprice=products.aggregate(Max('min_price'))['min_price__max']
+    minprice=products.aggregate(Min('min_price'))['min_price__min']
+    if "budget" in request.GET:
+        case=int(request.GET.get('sort'))
         if(case == 1):
             sortvalue=1
-            products = Product.objects.all().filter(category="CPU").order_by("min_price")
+            products = products.order_by("min_price")
         elif(case == 2):
             sortvalue=2
-            products = Product.objects.all().filter(category="CPU").order_by("-min_price")
+            products = products.order_by("-min_price")
         elif(case == 3):
             sortvalue=3
-            products = Product.objects.all().filter(category="CPU").order_by("title")
+            products = products.order_by("title")
         elif(case == 4):
             sortvalue=4
-            products = Product.objects.all().filter(category="CPU").order_by("-title")
+            products = products.order_by("-title")
+        if(int(request.GET.get('budget'))>0):
+            products=products.filter(min_price__lte=int(request.GET.get('budget')))
+        context = {
+            'all_products':products
+        }
+        return render(request,"home_blocks/products_block.html",context)
     context = {
-        'sortvalue':sortvalue,
-        'all_products': products
+        'all_products': products,
+        'minprice':minprice,
+        'maxprice':maxprice
     }
     return render(request,"home.html",context)
 
