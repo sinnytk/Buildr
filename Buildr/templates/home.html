@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static from staticfiles %}
 {% block content %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
 <script>
@@ -10,6 +9,34 @@ $(document).ready(function() {
     $("#product-search").change(function () {
         location=this.value;
     });
+    $(document).on('input change', '#pricerange', function() {
+        $('#limit').html( $(this).val());
+        $.ajax({
+            url:'',
+            data : {
+                'budget':$(this).val(),
+                'sort':$("#sortselect").val()
+            },
+            success: function(data){
+                $("#products").html(data);
+            }
+        });
+    });
+    $("#sortselect").change(function () {
+        $.ajax({
+            url:'',
+            data : {
+                'budget':$("#pricerange").val(),
+                'sort':$(this).val()
+            },
+            success: function(data){
+                $("#products").html(data);
+            }
+        });
+    });
+
+
+    
 });
 </script>
 <div><img src="{% static 'images/banner.png'%}" style="width: 100%; height: 500px; object-fit: contain;"></img></div>
@@ -37,17 +64,19 @@ $(document).ready(function() {
     </div>
 </nav>
 <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
-    <form class="uk-navbar-center" action="" method="POST">{% csrf_token %}
-            <select name = "sort" class="uk-select" onchange="this.form.submit()">
-                <option {% if sortvalue == 0 %}selected{% endif %} disabled value="0">Sort by</option>
-                <option {% if sortvalue == 1 %}selected{% endif %} value="1">Price - ASC</option>
-                <option {% if sortvalue == 2 %}selected{% endif %} value="2">Price - DESC</option>
-                <option {% if sortvalue == 3 %}selected{% endif %} value="3">Title - ASC</option>
-                <option {% if sortvalue == 4 %}selected{% endif %} value="4">Title - DESC</option>
+    <form class="uk-navbar-center">
+            <select name="sort" class="uk-select" id="sortselect">
+                <option disabled value="0">Sort by</option>
+                <option value="1">Price - ASC</option>
+                <option value="2">Price - DESC</option>
+                <option value="3">Title - ASC</option>
+                <option value="4">Title - DESC</option>
             </select>
     </form>
+    <div class="uk-navbar-left uk-margin-left"><h4 id="limit" style="display:inline-block"></h4><input name="budget" class="uk-range" type="range" value="100" min={{minprice}} max={{maxprice}} step="10000" id="pricerange"></div>
 </nav>
 <!-- Thank god https://stackoverflow.com/a/22466415 for the perfect solution to iterating over the list and creating only 4 items -->
+<div id="products">
 {% for product in all_products %}
 {% if forloop.first %}<div class="uk-grid-match uk-child-width-expand@s uk-text-center uk-margin-left uk-margin-right uk-margin-top" uk-grid>{% endif %}
     <div>
@@ -67,4 +96,5 @@ $(document).ready(function() {
     {% if forloop.counter|divisibleby:4 %}</div><div class="uk-grid-match uk-child-width-expand@s uk-text-center uk-margin-left uk-margin-right uk-margin-top" uk-grid>{% endif %}
     {% if forloop.last %}</div>{% endif %}
 {% endfor %}
+</div>
 {% endblock %}

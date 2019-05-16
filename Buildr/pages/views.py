@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from product.models import Product,Processor,Motherboard,Ram,Gpu,ProductPrices
+from django.db.models import Max,Min
 def home_view(request, *args, **kwargs):
     products=Product.objects.all()
-    sortvalue=0
-    if request.method == 'POST':
-        case=int(request.POST.get('sort'))
+    maxprice=Product.objects.aggregate(Max('min_price'))['min_price__max']
+    minprice=Product.objects.aggregate(Min('min_price'))['min_price__min']
+    if "budget" in request.GET:
+        case=int(request.GET.get('sort'))
         if(case == 1):
             sortvalue=1
             products = Product.objects.all().order_by("min_price")
@@ -18,11 +20,19 @@ def home_view(request, *args, **kwargs):
         elif(case == 4):
             sortvalue=4
             products = Product.objects.all().order_by("-title")
+        if(int(request.GET.get('budget'))>0):
+            products=products.filter(min_price__lte=int(request.GET.get('budget')))
+        context = {
+            'all_products':products
+        }
+        return render(request,"home_blocks/products_block.html",context)
     context = {
-        'sortvalue':sortvalue,
-        'all_products': products
+        'all_products': products,
+        'minprice':minprice,
+        'maxprice':maxprice
     }
     return render(request,"home.html",context)
+
 
 def build_view(request, *args, **kwargs):
     context = {
